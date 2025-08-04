@@ -25,7 +25,7 @@ public class Fattura {
     private long numero;
 
     @ManyToOne
-    @JoinColumn(name = "id_fattura")
+    @JoinColumn(name = "id_stato_fattura")
     private StatoFattura statoFattura;
 
     public Fattura(LocalDate dataFattura, double importo, long numero, StatoFattura statoFattura) {
