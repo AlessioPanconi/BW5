@@ -1,7 +1,9 @@
 package buildweeek.bw2.exceptions;
 
+import java.util.UUID;
+
 public class NotFoundException extends RuntimeException {
-	public NotFoundException(Long id) {
+	public NotFoundException(UUID id) {
 		super("La risorsa con id " + id + " non è stata trovata!");
 	}
 

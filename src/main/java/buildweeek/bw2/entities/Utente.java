@@ -6,16 +6,22 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
+
 @Entity
 @Table(name = "utente")
 @Getter
 @Setter
 @NoArgsConstructor
 //@JsonIgnoreProperties({"password","authorities","enabled","accountNonExpired","credentialsNonExpired","accountNonLocked"})
-public class Utente {
+public class Utente implements UserDetails{
 
     @Id
     @GeneratedValue
@@ -39,13 +45,14 @@ public class Utente {
     private List<Ruolo> ruoli;
 
 
-    public Utente(String username, String email, String password, String nome, String cognome, String avatarUrl) {
+    public Utente(String username, String email, String password, String nome, String cognome, String avatarUrl, List<Ruolo> ruoli) {
         this.username = username;
         this.email = email;
         this.password = password;
         this.nome = nome;
         this.cognome = cognome;
         this.avatarUrl = avatarUrl;
+        this.ruoli = ruoli;
     }
 
     @Override
@@ -60,4 +67,12 @@ public class Utente {
                 ", cognome='" + cognome + '\'' +
                 '}';
     }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return ruoli.stream()
+                .map(ruolo -> new SimpleGrantedAuthority(ruolo.getNomeRuolo()))
+                .collect(Collectors.toList());
+    }
+
 }
