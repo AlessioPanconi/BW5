@@ -22,7 +22,8 @@ public class Provincia {
     private String nome;
     private String sigla;
 
-    @OneToMany(mappedBy = "id_comune")
+    @OneToMany
+    @JoinColumn(name = "id_provincia")
     private List<Comune> comuni;
 
     public Provincia(String nome, String sigla) {

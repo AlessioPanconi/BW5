@@ -21,7 +21,8 @@ public class Comune {
     private UUID idComune;
     private String nome;
 
-    @OneToMany(mappedBy = "id_indirizzo")
+    @OneToMany
+    @JoinColumn(name = "id_comune")
     private List<Indirizzo> indirizzi;
 
     public Comune(String nome) {
