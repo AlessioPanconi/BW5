@@ -61,9 +61,12 @@ public class ClienteService {
                 throw new BadRequestException("Inerisci un tipo di cliente valido!");
             }
 
-            Cliente newCliente = new Cliente(payload.email(),payload.pec(), payload.telefono(), payload.partitaIva(), payload.ragioneSociale(), dataInserimento,dataUltimoContatto, payload.fatturatoAnnuale(), payload.emailContatto(), payload.nomeContatto(), payload.cognomeContatto(), payload.telefonoContatto(),type);
+            Cliente newCliente = new Cliente(payload.email(),payload.pec(), payload.telefono(), payload.partitaIva(), payload.ragioneSociale(),
+                    dataInserimento,dataUltimoContatto, payload.fatturatoAnnuale(), payload.emailContatto(), payload.nomeContatto(),
+                    payload.cognomeContatto(), payload.telefonoContatto(),type);
             Cliente savedCliente = this.clienteRepository.save(newCliente);
-            return newCliente;
+            System.out.println("Il cliente con id: " + savedCliente.getIdCliente() + " è stato salvato correttamente!");
+            return savedCliente;
 
         } catch (DateTimeParseException e) {
             throw new BadRequestException("Il formato della data inserita non è valido. Il formato corretto è yyyy-mm-dd.");
