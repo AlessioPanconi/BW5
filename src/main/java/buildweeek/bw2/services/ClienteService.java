@@ -1,8 +1,10 @@
 package buildweeek.bw2.services;
 
+import buildweeek.bw2.DTO.payloadMetodiClienti.DataInserimentoDTO;
 import buildweeek.bw2.DTO.NewClienteDTO;
+import buildweeek.bw2.DTO.payloadMetodiClienti.DataUltimoContattoDTO;
+import buildweeek.bw2.DTO.payloadMetodiClienti.PartialNameDTO;
 import buildweeek.bw2.entities.Cliente;
-import buildweeek.bw2.entities.Utente;
 import buildweeek.bw2.enums.CustomerType;
 import buildweeek.bw2.exceptions.BadRequestException;
 import buildweeek.bw2.exceptions.NotFoundException;
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -158,5 +161,79 @@ public class ClienteService {
         return this.clienteRepository.findAll(pageable);
     }
 
+    public List<Cliente> findClientiByFatturatoMaggiore(double fatturatoAnnuale)
+    {
+        List<Cliente> clienti = this.clienteRepository.findAll();
+        List<Cliente> clientiFiltrati = clienti.stream()
+                .filter(cliente -> cliente.getFatturatoAnnuale() >= fatturatoAnnuale).toList();
+
+        return clientiFiltrati;
+    }
+
+    public List<Cliente> findClientiByFatturatoMinore(double fatturatoAnnuale)
+    {
+        List<Cliente> clienti = this.clienteRepository.findAll();
+        List<Cliente> clientiFiltrati = clienti.stream()
+                .filter(cliente -> cliente.getFatturatoAnnuale() < fatturatoAnnuale).toList();
+
+        return clientiFiltrati;
+    }
+
+    public List<Cliente> findClientiByBeforeDataInserimento(DataInserimentoDTO payload)
+    {
+        try {
+            LocalDate dataInserimento = LocalDate.parse(payload.dataInserimento());
+            List<Cliente> clienti = this.clienteRepository.findAll();
+
+            List<Cliente> clientiFiltrati = clienti.stream()
+                    .filter(cliente -> cliente.getDataInserimento().isBefore(dataInserimento)).toList();
+
+            return clientiFiltrati;
+
+        } catch (DateTimeParseException e) {
+            throw new BadRequestException("Il formato della data inserita non è valido. Il formato corretto è yyyy-mm-dd.");
+        }
+    }
+
+    public List<Cliente> findClientiByAfterDataInserimento(DataInserimentoDTO payload)
+    {
+        try {
+            LocalDate dataInserimento = LocalDate.parse(payload.dataInserimento());
+            List<Cliente> clienti = this.clienteRepository.findAll();
+
+            List<Cliente> clientiFiltrati = clienti.stream()
+                    .filter(cliente -> cliente.getDataInserimento().isAfter(dataInserimento)).toList();
+
+            return clientiFiltrati;
+
+        } catch (DateTimeParseException e) {
+            throw new BadRequestException("Il formato della data inserita non è valido. Il formato corretto è yyyy-mm-dd.");
+        }
+    }
+
+    public List<Cliente> findClientiByDataUltimoContatto(DataUltimoContattoDTO payload)
+    {
+        try {
+            LocalDate dataInserimento = LocalDate.parse(payload.dataUltimoContatto());
+            List<Cliente> clienti = this.clienteRepository.findAll();
+
+            List<Cliente> clientiFiltrati = clienti.stream()
+                    .filter(cliente -> cliente.getDataUltimoContatto().isEqual(dataInserimento)).toList();
+
+            return clientiFiltrati;
+
+        } catch (DateTimeParseException e) {
+            throw new BadRequestException("Il formato della data inserita non è valido. Il formato corretto è yyyy-mm-dd.");
+        }
+    }
+
+    public List<Cliente> findClientiByPartialName(PartialNameDTO payload)
+    {
+        List<Cliente> clienti = this.clienteRepository.findAll();
+
+        List<Cliente> clientiFiltrati = clienti.stream()
+                .filter(cliente -> cliente.getNomeContatto().contains(payload.nomeContatto())).toList();
+        return clientiFiltrati;
+    }
 
 }

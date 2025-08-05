@@ -12,8 +12,8 @@ public record NewClienteDTO(
         @NotEmpty(message = "La pec è obbligatoria")
         @Email(message = "L'indirizzo pec inserito non è nel formato giusto")
         String pec,
-                            @NotEmpty(message = "Il numero di telefono è obbligatorio!")
-                            String telefono,
+        @NotEmpty(message = "Il numero di telefono è obbligatorio!")
+        String telefono,
         @NotEmpty(message = "La partita iva è obbligatoria!")
         @Size(min = 11, max = 11, message = "La partita iva ha 11 numeri!")
         String partitaIva,

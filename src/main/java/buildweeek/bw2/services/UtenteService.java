@@ -1,6 +1,7 @@
 package buildweeek.bw2.services;
 
 import buildweeek.bw2.DTO.NewUtenteDTO;
+import buildweeek.bw2.entities.Cliente;
 import buildweeek.bw2.entities.Ruolo;
 import buildweeek.bw2.entities.Utente;
 import buildweeek.bw2.exceptions.BadRequestException;
