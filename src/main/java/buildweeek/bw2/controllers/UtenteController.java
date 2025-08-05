@@ -34,7 +34,7 @@ public class UtenteController {
     @Autowired
     private ClienteService clienteService;
 
-//Opzioni per admin
+    // Opzioni per admin
 
     @PostMapping
     @PreAuthorize("hasAuthority('ADMIN')")
@@ -73,19 +73,19 @@ public class UtenteController {
         return this.utenteService.findUtenteByIdAndUpdate(idUtente, payload);
     }
 
-    @PatchMapping("/{idUtente}")
+    @PatchMapping("/{idUtente}/addRole")
     @PreAuthorize("hasAuthority('ADMIN')")
     public void findUtenteByAndPatchRole(@PathVariable UUID idUtente) {
         this.utenteService.findUtenteByIdAndPatchRuolo(idUtente);
     }
 
-    @PatchMapping("/{idUtente}")
+    @PatchMapping("/{idUtente}/removeRole")
     @PreAuthorize("hasAuthority('ADMIN')")
     public void findUtenteByAndDeleteRoleAdmin(@PathVariable UUID idUtente) {
         this.utenteService.findUtenteByIdAndRemoveAdmin(idUtente);
     }
 
-//sezione /me opzioni che può fare un utente dopo il login su se stesso
+    // sezione /me
 
     @GetMapping("/me")
     public Utente trovaIlMioProfilo(@AuthenticationPrincipal Utente currentAuthenticatedUtente) {
@@ -99,22 +99,67 @@ public class UtenteController {
 
     @DeleteMapping("/me")
     public void eliminaIlMioProfilo(@AuthenticationPrincipal Utente currentAuthenticatedUtente) {
-        this.utenteService.findUtenteById(currentAuthenticatedUtente.getIdUtente());
+        this.utenteService.findUtenteByIdAndDelete(currentAuthenticatedUtente.getIdUtente());
     }
 
     @PatchMapping("/me/{idUtente}/avatar")
     public String uploadImage(@PathVariable UUID idUtente, @RequestParam("avatar") MultipartFile file, @AuthenticationPrincipal Utente currentAuthenticatedUtente) {
-        System.out.println(file.getOriginalFilename());
-        System.out.println(file.getSize());
         return this.utenteService.uploadAvatar(idUtente, file);
     }
 
-    //Sezione cliente
+    // Sezione cliente
 
-    @GetMapping
+    @PostMapping("/cliente")
+    public Cliente saveCliente(@RequestBody @Validated NewClienteDTO payload) {
+        return this.clienteService.saveCliente(payload);
+    }
+
+    @PutMapping("/cliente/{clienteId}")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public Page<Cliente> getPageClienti(@RequestParam(defaultValue = "0") int pageNumber, @RequestParam(defaultValue = "10") int pageSize) {
-        return this.clienteService.findAllClienti(pageNumber, pageSize);
+    public Cliente updateCliente(@PathVariable UUID clienteId, @RequestBody @Validated NewClienteDTO payload) {
+        return this.clienteService.findClienteByIdAndUpdate(clienteId, payload);
+    }
+
+    @DeleteMapping("/cliente/{clienteId}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public void deleteCliente(@PathVariable UUID clienteId) {
+        this.clienteService.findClienteByIdAndDelete(clienteId);
+    }
+
+    @PostMapping("/cliente/byFatturatoMag")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public List<Cliente> findClientiByFatturatoMaggiore(@RequestBody @Validated FatturatoAnnualeDTO payload) {
+        return this.clienteService.findClientiByFatturatoMaggiore(payload);
+    }
+
+    @PostMapping("/cliente/byFatturatoMin")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public List<Cliente> findClientiByFatturatoMinore(@RequestBody @Validated FatturatoAnnualeDTO payload) {
+        return this.clienteService.findClientiByFatturatoMinore(payload);
+    }
+
+    @PostMapping("/cliente/byDataInserimentoBefore")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public List<Cliente> findClientiByBeforeDataInserimento(@RequestBody @Validated DataInserimentoDTO payload) {
+        return this.clienteService.findClientiByBeforeDataInserimento(payload);
+    }
+
+    @PostMapping("/cliente/byDataInserimentoAfter")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public List<Cliente> findClientiByAfterDataInserimento(@RequestBody @Validated DataInserimentoDTO payload) {
+        return this.clienteService.findClientiByAfterDataInserimento(payload);
+    }
+
+    @PostMapping("/cliente/byDataUltimoContatto")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public List<Cliente> findClientiByDataUltimoContatto(@RequestBody @Validated DataUltimoContattoDTO payload) {
+        return this.clienteService.findClientiByDataUltimoContatto(payload);
+    }
+
+    @PostMapping("/cliente/byPartialName")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public List<Cliente> findClientiByPartialName(@RequestBody @Validated PartialNameDTO payload) {
+        return this.clienteService.findClientiByPartialName(payload);
     }
 
     @GetMapping("/cliente")
@@ -122,82 +167,20 @@ public class UtenteController {
         return this.clienteService.findAll(pageNumber, pageSize, sort);
     }
 
-    @GetMapping("/cliente")
-    public Page<Cliente> getPageClientiSortByFatturato(@RequestParam(defaultValue = "0") int pageNumber, @RequestParam(defaultValue = "10") int pageSize, @RequestParam(defaultValue = "fatturatoAnnuale") String sort) {
-        return this.clienteService.findAll(pageNumber, pageSize, sort);
+    @GetMapping("/cliente/sortByFatturato")
+    public Page<Cliente> getPageClientiSortByFatturato(@RequestParam(defaultValue = "0") int pageNumber, @RequestParam(defaultValue = "10") int pageSize) {
+        return this.clienteService.findAll(pageNumber, pageSize, "fatturatoAnnuale");
     }
 
-    @GetMapping("/cliente")
+    @GetMapping("/cliente/sortByDataInserimento")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public Page<Cliente> getPageClientiByDataInserimento(@RequestParam(defaultValue = "0") int pageNumber, @RequestParam(defaultValue = "10") int pageSize, @RequestParam(defaultValue = "dataInserimento") String sort) {
-        return this.clienteService.findAll(pageNumber, pageSize, sort);
+    public Page<Cliente> getPageClientiByDataInserimento(@RequestParam(defaultValue = "0") int pageNumber, @RequestParam(defaultValue = "10") int pageSize) {
+        return this.clienteService.findAll(pageNumber, pageSize, "dataInserimento");
     }
 
-    @GetMapping("/cliente")
+    @GetMapping("/cliente/sortByDataUltimoContatto")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public Page<Cliente> getPageClientiByDataUltimoContatto(@RequestParam(defaultValue = "0") int pageNumber, @RequestParam(defaultValue = "10") int pageSize, @RequestParam(defaultValue = "dataUltimoContatto") String sort) {
-        return this.clienteService.findAllReverse(pageNumber, pageSize, sort);
+    public Page<Cliente> getPageClientiByDataUltimoContatto(@RequestParam(defaultValue = "0") int pageNumber, @RequestParam(defaultValue = "10") int pageSize) {
+        return this.clienteService.findAllReverse(pageNumber, pageSize, "dataUltimoContatto");
     }
-
-    //Sort by provincia per sede legale
-
-    @GetMapping("/cliente")
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public List<Cliente> findClientiByFatturatoMaggiore(@RequestBody @Validated FatturatoAnnualeDTO payload) {
-        return this.clienteService.findClientiByFatturatoMaggiore(payload);
-    }
-
-    @GetMapping("/cliente")
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public List<Cliente> findClientiByFatturatoMinore(@RequestBody @Validated FatturatoAnnualeDTO payload) {
-        return this.clienteService.findClientiByFatturatoMinore(payload);
-    }
-
-    @GetMapping("/cliente")
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public List<Cliente> findClientiByBeforeDataInserimento(@RequestBody @Validated DataInserimentoDTO payload) {
-        return this.clienteService.findClientiByBeforeDataInserimento(payload);
-    }
-
-    @GetMapping("/cliente")
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public List<Cliente> findClientiByAfterDataInserimento(@RequestBody @Validated DataInserimentoDTO payload) {
-        return this.clienteService.findClientiByAfterDataInserimento(payload);
-    }
-
-    @GetMapping("/cliente")
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public List<Cliente> findClientiByDataUltimoContatto(@RequestBody @Validated DataUltimoContattoDTO payload) {
-        return this.clienteService.findClientiByDataUltimoContatto(payload);
-    }
-
-    @GetMapping("/cliente")
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public List<Cliente> findClientiByPartialName(@RequestBody @Validated PartialNameDTO payload) {
-        return this.clienteService.findClientiByPartialName(payload);
-    }
-
-    //POST cliente
-
-    @PostMapping("/cliente")
-    public Cliente saveCliente(@RequestBody @Validated NewClienteDTO payload) {
-        return this.clienteService.saveCliente(payload);
-    }
-
-    //PUT cliente
-
-    @PutMapping("/cliente/{clienteId}")
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public Cliente updateCliente(@RequestParam UUID clienteId, @RequestBody @Validated NewClienteDTO payload) {
-        return this.clienteService.findClienteByIdAndUpdate(clienteId, payload);
-    }
-
-    //DELETE cliente
-  @DeleteMapping("/cliente/{clienteId}")
-  @PreAuthorize("hasAuthority('ADMIN')")
-  public void deleteCliente(@RequestParam UUID clienteId) {
-        return this.clienteService.findClienteByIdAndDelete(clienteId);
-  }
-
-
 }
