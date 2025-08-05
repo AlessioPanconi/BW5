@@ -28,16 +28,6 @@ public class JWTTools {
                 .compact();
     }
 
-    public String createTokenCliente(Cliente cliente) {
-
-        return Jwts.builder()
-                .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 7))
-                .subject(String.valueOf(cliente.getIdCliente()))
-                .signWith(Keys.hmacShaKeyFor(secret.getBytes()))
-                .compact();
-    }
-
     public void verifyToken(String accessToken) {
         try {
             Jwts.parser().verifyWith(Keys.hmacShaKeyFor(secret.getBytes())).build().parse(accessToken);

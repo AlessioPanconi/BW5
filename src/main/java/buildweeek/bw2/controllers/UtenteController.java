@@ -1,7 +1,6 @@
 package buildweeek.bw2.controllers;
 
 import buildweeek.bw2.DTO.NewUtenteDTO;
-import buildweeek.bw2.DTO.UpdateUtenteDTO;
 import buildweeek.bw2.entities.Utente;
 import buildweeek.bw2.exceptions.ValidationException;
 import buildweeek.bw2.services.UtenteService;
@@ -24,6 +23,21 @@ public class UtenteController {
     @Autowired
     private UtenteService utenteService;
 
+//Opzioni per admin
+
+    @PostMapping
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @ResponseStatus(HttpStatus.CREATED)
+    public Utente createUtente (@RequestBody @Validated NewUtenteDTO body, BindingResult validationResult)
+    {
+        if(validationResult.hasErrors()){
+            throw new ValidationException(validationResult.getFieldErrors()
+                    .stream().map(fieldError -> fieldError.getDefaultMessage()).toList());
+        } else{
+            return this.utenteService.saveUtente(body);
+        }
+    }
+
     @GetMapping
     @PreAuthorize("hasAuthority('ADMIN')")
     public Page<Utente> getPageUtenti(@RequestParam(defaultValue = "0") int pageNumber, @RequestParam(defaultValue = "10") int pageSize)
@@ -32,10 +46,7 @@ public class UtenteController {
     @GetMapping("/{idUtente}")
     @PreAuthorize("hasAuthority('ADMIN')")
     public Utente getDipendenteById(@PathVariable UUID idUtente)
-    {
-        return this.utenteService.findUtenteById(idUtente);
-
-    }
+    {return this.utenteService.findUtenteById(idUtente);}
 
     @DeleteMapping("/{idUtente}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -44,16 +55,28 @@ public class UtenteController {
         this.utenteService.findUtenteByIdAndDelete(idUtente);
     }
 
-//    @PutMapping("/{idUtente}")
-//    public Utente findUtenteByIdAndUpdate (@PathVariable UUID idUtente,@RequestBody @Validated UpdateUtenteDTO body, BindingResult validationResult)
-//    {
-//        if(validationResult.hasErrors()){
-//            throw new ValidationException(validationResult.getFieldErrors()
-//                    .stream().map(fieldError -> fieldError.getDefaultMessage()).toList());
-//        } else{
-//            return this.utenteService.findUtenteByIdAndUpdate(idUtente,body);
-//        }
-//    }
+    @PutMapping("/{idUtente}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public Utente getUtenteByIdAndUpdate(@PathVariable UUID idUtente, @RequestBody @Validated NewUtenteDTO payload)
+    {
+        return this.utenteService.findUtenteByIdAndUpdate(idUtente , payload);
+    }
+
+    @PatchMapping("/{idUtente}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public void findUtenteByAndPatchRole(@PathVariable UUID idUtente)
+    {
+        this.utenteService.findUtenteByIdAndPatchRuolo(idUtente);
+    }
+
+    @PatchMapping("/{idUtente}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public void findUtenteByAndDeleteRoleAdmin(@PathVariable UUID idUtente)
+    {
+        this.utenteService.findUtenteByIdAndRemoveAdmin(idUtente);
+    }
+
+//sezione me opzioni che può fare un utente dopo il login su se stesso
 
     @GetMapping("/me")
     public Utente trovaIlMioProfilo(@AuthenticationPrincipal Utente currentAuthenticatedUtente)
@@ -62,7 +85,7 @@ public class UtenteController {
     }
 
     @PutMapping("/me")
-    public Utente modificaIlMioProfilo(@AuthenticationPrincipal Utente currentAuthenticatedUtente, @RequestBody @Validated UpdateUtenteDTO payload)
+    public Utente modificaIlMioProfilo(@AuthenticationPrincipal Utente currentAuthenticatedUtente, @RequestBody @Validated NewUtenteDTO payload)
     {
         return this.utenteService.findUtenteByIdAndUpdate(currentAuthenticatedUtente.getIdUtente(),payload);
     }
@@ -73,8 +96,8 @@ public class UtenteController {
         this.utenteService.findUtenteById(currentAuthenticatedUtente.getIdUtente());
     }
 
-    @PatchMapping("/{idUtente}/avatar")
-    public String uploadImage(@PathVariable UUID idUtente,@RequestParam("avatar") MultipartFile file) {
+    @PatchMapping("/me/{idUtente}/avatar")
+    public String uploadImage(@PathVariable UUID idUtente,@RequestParam("avatar") MultipartFile file,@AuthenticationPrincipal Utente currentAuthenticatedUtente) {
         System.out.println(file.getOriginalFilename());
         System.out.println(file.getSize());
         return this.utenteService.uploadAvatar(idUtente, file);
