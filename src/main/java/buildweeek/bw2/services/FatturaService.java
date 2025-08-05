@@ -9,7 +9,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -45,4 +48,14 @@ public class FatturaService {
         Fattura fnd = this.findById(fatturaId);
         this.fatturaRepository.delete(fnd);
     }
+//    public List<Fattura> findByImportoBetween(double importoMin , double importoMax){
+//        return fatture.stream().filter(fattura-> fattura.getImporto()<importoMax && fattura.getImporto()>importoMin).collect(Collectors.toList());
+//    }
+    public List<Fattura> findBydataFattura(List<Fattura> fatture, LocalDate date){
+        return fatture.stream().filter(fattura -> fattura.getDataFattura().isBefore(date) || fattura.getDataFattura().isEqual(date)).collect(Collectors.toList());
+    }
+    public List<Fattura> findByAnno(List<Fattura> fatture, LocalDate date){
+        return fatture.stream().filter(fattura -> fattura.getDataFattura().getYear()== date.getYear()).collect(Collectors.toList());
+    }
+
 }

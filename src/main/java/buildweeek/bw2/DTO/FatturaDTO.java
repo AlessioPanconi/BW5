@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotEmpty;
 
 import java.time.LocalDate;
 
+
 public record FatturaDTO(
         @NotEmpty(message = "La data della fattura è obbligatoria!")
         @FutureOrPresent(message = "La data non può non essere di un giorno passato!")
