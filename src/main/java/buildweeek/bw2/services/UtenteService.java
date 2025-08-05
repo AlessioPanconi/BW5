@@ -65,8 +65,6 @@ public class UtenteService {
         System.out.println("L'utente: "+ payload.username()+ "con email: "+ payload.email() +" è stato salvato correttamente");
         return savedNewUtente;
     }
-    // rifare update
-
 
     public void findUtenteByIdAndPatchRuolo (UUID idUtente)
     {

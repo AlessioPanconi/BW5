@@ -3,6 +3,7 @@ package buildweeek.bw2.services;
 import buildweeek.bw2.DTO.payloadMetodiClienti.DataInserimentoDTO;
 import buildweeek.bw2.DTO.NewClienteDTO;
 import buildweeek.bw2.DTO.payloadMetodiClienti.DataUltimoContattoDTO;
+import buildweeek.bw2.DTO.payloadMetodiClienti.FatturatoAnnualeDTO;
 import buildweeek.bw2.DTO.payloadMetodiClienti.PartialNameDTO;
 import buildweeek.bw2.entities.Cliente;
 import buildweeek.bw2.enums.CustomerType;
@@ -161,20 +162,20 @@ public class ClienteService {
         return this.clienteRepository.findAll(pageable);
     }
 
-    public List<Cliente> findClientiByFatturatoMaggiore(double fatturatoAnnuale)
+    public List<Cliente> findClientiByFatturatoMaggiore(FatturatoAnnualeDTO payload)
     {
         List<Cliente> clienti = this.clienteRepository.findAll();
         List<Cliente> clientiFiltrati = clienti.stream()
-                .filter(cliente -> cliente.getFatturatoAnnuale() >= fatturatoAnnuale).toList();
+                .filter(cliente -> cliente.getFatturatoAnnuale() >= payload.fatturatoAnnuale()).toList();
 
         return clientiFiltrati;
     }
 
-    public List<Cliente> findClientiByFatturatoMinore(double fatturatoAnnuale)
+    public List<Cliente> findClientiByFatturatoMinore(FatturatoAnnualeDTO payload)
     {
         List<Cliente> clienti = this.clienteRepository.findAll();
         List<Cliente> clientiFiltrati = clienti.stream()
-                .filter(cliente -> cliente.getFatturatoAnnuale() < fatturatoAnnuale).toList();
+                .filter(cliente -> cliente.getFatturatoAnnuale() < payload.fatturatoAnnuale()).toList();
 
         return clientiFiltrati;
     }
