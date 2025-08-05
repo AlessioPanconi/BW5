@@ -1,5 +1,6 @@
 package buildweeek.bw2.controllers;
 
+import buildweeek.bw2.DTO.NewClienteDTO;
 import buildweeek.bw2.DTO.NewUtenteDTO;
 import buildweeek.bw2.DTO.payloadMetodiClienti.DataInserimentoDTO;
 import buildweeek.bw2.DTO.payloadMetodiClienti.DataUltimoContattoDTO;
@@ -109,6 +110,13 @@ public class UtenteController {
     }
 
     //Sezione cliente
+
+    @GetMapping
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public Page<Cliente> getPageClienti(@RequestParam(defaultValue = "0") int pageNumber, @RequestParam(defaultValue = "10") int pageSize) {
+        return this.clienteService.findAllClienti(pageNumber, pageSize);
+    }
+
     @GetMapping("/cliente")
     public Page<Cliente> getPageClientiSortByName(@RequestParam(defaultValue = "0") int pageNumber, @RequestParam(defaultValue = "10") int pageSize, @RequestParam(defaultValue = "nomeContatto") String sort) {
         return this.clienteService.findAll(pageNumber, pageSize, sort);
@@ -168,6 +176,28 @@ public class UtenteController {
     public List<Cliente> findClientiByPartialName(@RequestBody @Validated PartialNameDTO payload) {
         return this.clienteService.findClientiByPartialName(payload);
     }
+
+    //POST cliente
+
+    @PostMapping("/cliente")
+    public Cliente saveCliente(@RequestBody @Validated NewClienteDTO payload) {
+        return this.clienteService.saveCliente(payload);
+    }
+
+    //PUT cliente
+
+    @PutMapping("/cliente/{clienteId}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public Cliente updateCliente(@RequestParam UUID clienteId, @RequestBody @Validated NewClienteDTO payload) {
+        return this.clienteService.findClienteByIdAndUpdate(clienteId, payload);
+    }
+
+    //DELETE cliente
+  @DeleteMapping("/cliente/{clienteId}")
+  @PreAuthorize("hasAuthority('ADMIN')")
+  public void deleteCliente(@RequestParam UUID clienteId) {
+        return this.clienteService.findClienteByIdAndDelete(clienteId);
+  }
 
 
 }
