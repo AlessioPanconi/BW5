@@ -44,6 +44,11 @@ public class UtenteService {
         return this.utenteRepository.findById(idUtente).orElseThrow(()-> new NotFoundException(idUtente));
     }
 
+    public Utente findByEmail(String email)
+    {
+        return this.utenteRepository.findByEmail(email).orElseThrow(()-> new NotFoundException(email));
+    }
+
     public Utente saveUtente(NewUtenteDTO payload)
     {
         this.utenteRepository.findByEmail(payload.email()).ifPresent(utente -> {
