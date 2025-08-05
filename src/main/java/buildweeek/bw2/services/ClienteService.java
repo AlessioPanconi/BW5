@@ -1,20 +1,20 @@
 package buildweeek.bw2.services;
 
 import buildweeek.bw2.DTO.NewClienteDTO;
-import buildweeek.bw2.DTO.NewUtenteDTO;
 import buildweeek.bw2.entities.Cliente;
-import buildweeek.bw2.entities.Ruolo;
-import buildweeek.bw2.entities.Utente;
 import buildweeek.bw2.enums.CustomerType;
 import buildweeek.bw2.exceptions.BadRequestException;
+import buildweeek.bw2.exceptions.NotFoundException;
 import buildweeek.bw2.repositories.ClienteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.UUID;
 
 @Service
 public class ClienteService {
@@ -22,7 +22,14 @@ public class ClienteService {
     @Autowired
     private ClienteRepository clienteRepository;
 
+    public Page<Cliente> findAllClienti(int pageNumber, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        return this.clienteRepository.findAll(pageable);
+    }
 
+    public Cliente findClienteById(UUID idCliente) {
+        return this.clienteRepository.findById(idCliente).orElseThrow(()-> new NotFoundException(idCliente));
+    }
 
     public Cliente saveCliente(NewClienteDTO payload)
     {
@@ -49,13 +56,13 @@ public class ClienteService {
             String customerTypeStr = payload.customerType();
             CustomerType type = null;
 
-            if ("PA".equals(customerTypeStr.toUpperCase())) {
+            if ("PA".equalsIgnoreCase(customerTypeStr)) {
                 type = CustomerType.PA;
-            } else if ("SAS".equals(customerTypeStr.toUpperCase())) {
+            } else if ("SAS".equalsIgnoreCase(customerTypeStr)) {
                 type = CustomerType.SAS;
-            } else if ("SPA".equals(customerTypeStr.toUpperCase())) {
+            } else if ("SPA".equalsIgnoreCase(customerTypeStr)) {
                 type = CustomerType.SPA;
-            } else if ("SRL".equals(customerTypeStr.toUpperCase())) {
+            } else if ("SRL".equalsIgnoreCase(customerTypeStr)) {
             type = CustomerType.SRL;
             } else {
                 throw new BadRequestException("Inerisci un tipo di cliente valido!");
@@ -72,6 +79,12 @@ public class ClienteService {
             throw new BadRequestException("Il formato della data inserita non è valido. Il formato corretto è yyyy-mm-dd.");
         }
 
+    }
+    
+
+    public void findClienteByIdAndDelete(UUID idCliente) {
+        Cliente found = findClienteById(idCliente);
+        this.clienteRepository.delete(found);
     }
 
 }

@@ -35,11 +35,6 @@ public class UtenteService {
     @Autowired
     private Cloudinary getImageUploader;
 
-
-    public Utente findByEmail(String email) {
-        return this.utenteRepository.findByEmail(email).orElseThrow(() -> new NotFoundException("Il dipendente con l'email " + email + " non è stato trovato!"));
-    }
-
     public Page<Utente> findAll(int pageNumber, int pageSize) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
         return this.utenteRepository.findAll(pageable);
