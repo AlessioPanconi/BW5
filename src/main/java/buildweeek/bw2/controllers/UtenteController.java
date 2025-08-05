@@ -61,11 +61,11 @@ public class UtenteController {
         return this.utenteService.findUtenteById(currentAuthenticatedUtente.getIdUtente());
     }
 
-    @PutMapping("/me")
-    public Utente modificaIlMioProfilo(@AuthenticationPrincipal Utente currentAuthenticatedUtente, @RequestBody @Validated UpdateUtenteDTO payload)
-    {
-        return this.utenteService.findUtenteByIdAndUpdate(currentAuthenticatedUtente.getIdUtente(),payload);
-    }
+//    @PutMapping("/me")
+//    public Utente modificaIlMioProfilo(@AuthenticationPrincipal Utente currentAuthenticatedUtente, @RequestBody @Validated UpdateUtenteDTO payload)
+//    {
+//        return this.utenteService.findUtenteByIdAndUpdate(currentAuthenticatedUtente.getIdUtente(),payload);
+//    }
 
     @DeleteMapping("/me")
     public void eliminaIlMioProfilo(@AuthenticationPrincipal Utente currentAuthenticatedUtente)

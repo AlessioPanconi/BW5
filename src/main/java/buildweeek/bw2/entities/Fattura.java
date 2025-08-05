@@ -27,6 +27,9 @@ public class Fattura {
     @ManyToOne
     @JoinColumn(name = "id_stato_fattura")
     private StatoFattura statoFattura;
+    @ManyToOne
+    @JoinColumn(name = "cliente_id")
+    private Cliente cliente;
 
     public Fattura(LocalDate dataFattura, double importo, long numero, StatoFattura statoFattura) {
         this.dataFattura = dataFattura;
