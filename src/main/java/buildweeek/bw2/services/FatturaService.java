@@ -1,7 +1,9 @@
 package buildweeek.bw2.services;
 
 import buildweeek.bw2.DTO.FatturaDTO;
+import buildweeek.bw2.entities.Cliente;
 import buildweeek.bw2.entities.Fattura;
+import buildweeek.bw2.entities.StatoFattura;
 import buildweeek.bw2.exceptions.BadRequestException;
 import buildweeek.bw2.exceptions.NotFoundException;
 import buildweeek.bw2.repositories.FatturaRepository;
@@ -11,8 +13,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 
 @Service
@@ -20,6 +22,8 @@ import java.util.stream.Collectors;
 public class FatturaService {
     @Autowired
     private FatturaRepository fatturaRepository;
+    @Autowired
+    private ClienteService clienteService;
 
     public Fattura save(FatturaDTO payload){
         this.fatturaRepository.findByNumero(payload.numero()).ifPresent(numero->{
@@ -66,5 +70,11 @@ public class FatturaService {
 
         return this.fatturaRepository.findByDataFatturaBetween(inizioAnno,fineAnno);
     }
-
+    public List<Fattura> findByStatoFattura(StatoFattura statoFattura){
+        return this.fatturaRepository.findByStatoFattura(statoFattura);
+    }
+    public List<Fattura> findByCliente(UUID clienteId){
+        Optional<Cliente> cliente = this.clienteService.findClienteById(clienteId);
+        return this.fatturaRepository.findByCliente(cliente);
+    }
 }
