@@ -1,8 +1,10 @@
 package buildweeek.bw2.controllers;
 
 import buildweeek.bw2.DTO.NewUtenteDTO;
+import buildweeek.bw2.entities.Cliente;
 import buildweeek.bw2.entities.Utente;
 import buildweeek.bw2.exceptions.ValidationException;
+import buildweeek.bw2.services.ClienteService;
 import buildweeek.bw2.services.UtenteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -22,6 +24,9 @@ public class UtenteController {
 
     @Autowired
     private UtenteService utenteService;
+
+    @Autowired
+    private ClienteService clienteService;
 
 //Opzioni per admin
 
@@ -76,7 +81,7 @@ public class UtenteController {
         this.utenteService.findUtenteByIdAndRemoveAdmin(idUtente);
     }
 
-//sezione me opzioni che può fare un utente dopo il login su se stesso
+//sezione /me opzioni che può fare un utente dopo il login su se stesso
 
     @GetMapping("/me")
     public Utente trovaIlMioProfilo(@AuthenticationPrincipal Utente currentAuthenticatedUtente)
@@ -102,4 +107,25 @@ public class UtenteController {
         System.out.println(file.getSize());
         return this.utenteService.uploadAvatar(idUtente, file);
     }
+
+    //Sezione cliente
+    @GetMapping("/cliente")
+    public Page<Cliente> getPageClientiSortByName(@RequestParam(defaultValue = "0") int pageNumber, @RequestParam(defaultValue = "10") int pageSize, @RequestParam(defaultValue = "nomeContatto") String sort)
+    {return  this.clienteService.findAll(pageNumber, pageSize, sort);}
+
+    @GetMapping("/cliente")
+    public Page<Cliente> getPageClientiSortByFatturato(@RequestParam(defaultValue = "0") int pageNumber, @RequestParam(defaultValue = "10") int pageSize, @RequestParam(defaultValue = "fatturatoAnnuale") String sort)
+    {return  this.clienteService.findAll(pageNumber, pageSize, sort);}
+
+    @GetMapping("/cliente")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public Page<Cliente> getPageClientiByDataInserimento(@RequestParam(defaultValue = "0") int pageNumber, @RequestParam(defaultValue = "10") int pageSize, @RequestParam(defaultValue = "dataInserimento") String sort)
+    {return  this.clienteService.findAll(pageNumber, pageSize, sort);}
+
+    @GetMapping("/cliente")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public Page<Cliente> getPageClientiByDataUltimoContatto(@RequestParam(defaultValue = "0") int pageNumber, @RequestParam(defaultValue = "10") int pageSize, @RequestParam(defaultValue = "dataUltimoContatto") String sort)
+    {return  this.clienteService.findAllReverse(pageNumber, pageSize, sort);}
+
+    //Sort by provincia per sede legale
 }

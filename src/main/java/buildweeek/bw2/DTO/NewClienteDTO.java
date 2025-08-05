@@ -33,10 +33,9 @@ public record NewClienteDTO(
         String nomeContatto,
         @NotEmpty(message = "Il cognome del contatto è obbligatorio!")
         @Size(min = 2, max = 30, message = "Il cognome deve essere compreso tra i 2 e i 30 caratteri!")
-
         String cognomeContatto,
         @NotEmpty(message = "Il telefono del contatto è obbligatorio!")
-                            String telefonoContatto,
+        String telefonoContatto,
         @NotEmpty(message = "Il tipo di cliente è obbligatorio!")
-                            String customerType) {
+        String customerType) {
 }
