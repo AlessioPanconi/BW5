@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 
@@ -74,7 +73,7 @@ public class FatturaService {
         return this.fatturaRepository.findByStatoFattura(statoFattura);
     }
     public List<Fattura> findByCliente(UUID clienteId){
-        Optional<Cliente> cliente = this.clienteService.findClienteById(clienteId);
-        return this.fatturaRepository.findByCliente(cliente);
+        Cliente cliente = this.clienteService.findClienteById(clienteId);
+        return this.fatturaRepository.findFattureByCliente(cliente);
     }
 }

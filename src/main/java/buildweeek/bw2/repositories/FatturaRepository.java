@@ -16,5 +16,5 @@ public interface FatturaRepository extends JpaRepository<Fattura, UUID> {
     List<Fattura> findByDataFatturaBetween(LocalDate inizio, LocalDate fine);
     Optional<Fattura> findByNumero(long numero);
     List<Fattura> findByStatoFattura(StatoFattura statoFattura);
-    List<Fattura> findByCliente(Optional<Cliente> cliente);
+    List<Fattura> findFattureByCliente(Cliente cliente);
 }
