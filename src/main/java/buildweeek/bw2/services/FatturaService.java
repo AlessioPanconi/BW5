@@ -48,14 +48,23 @@ public class FatturaService {
         Fattura fnd = this.findById(fatturaId);
         this.fatturaRepository.delete(fnd);
     }
-//    public List<Fattura> findByImportoBetween(double importoMin , double importoMax){
-//        return fatture.stream().filter(fattura-> fattura.getImporto()<importoMax && fattura.getImporto()>importoMin).collect(Collectors.toList());
-//    }
-    public List<Fattura> findBydataFattura(List<Fattura> fatture, LocalDate date){
-        return fatture.stream().filter(fattura -> fattura.getDataFattura().isBefore(date) || fattura.getDataFattura().isEqual(date)).collect(Collectors.toList());
+
+    public List<Fattura> findByImporto(double importoMin , double importoMax)
+    {
+        return this.fatturaRepository.findByImportoBetween(importoMin, importoMax);
     }
-    public List<Fattura> findByAnno(List<Fattura> fatture, LocalDate date){
-        return fatture.stream().filter(fattura -> fattura.getDataFattura().getYear()== date.getYear()).collect(Collectors.toList());
+
+    public List<Fattura> findBydataFattura(LocalDate date){
+        return this.fatturaRepository.findByDataFattura(date);
+    }
+
+    public List<Fattura> findByAnno(int data){
+
+        int anno = data;
+        LocalDate inizioAnno = LocalDate.of(anno,1,1);
+        LocalDate fineAnno = LocalDate.of(anno,12,31);
+
+        return this.fatturaRepository.findByDataFatturaBetween(inizioAnno,fineAnno);
     }
 
 }

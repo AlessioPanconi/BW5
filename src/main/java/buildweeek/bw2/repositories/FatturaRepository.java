@@ -9,7 +9,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface FatturaRepository extends JpaRepository<Fattura, UUID> {
-//    List<Fattura> findBydataFattura(List<Fattura> fatture, LocalDate date);
-//    List<Fattura> findByImportoBetween(List<Fattura> fatture, double importoMin , double importoMax);
+    List<Fattura> findByDataFattura(LocalDate date);
+    List<Fattura> findByImportoBetween(double importoMin , double importoMax);
+    List<Fattura> findByDataFatturaBetween(LocalDate inizio, LocalDate fine);
     Optional<Fattura> findByNumero(long numero);
 }
