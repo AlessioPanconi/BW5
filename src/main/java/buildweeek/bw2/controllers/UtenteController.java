@@ -44,16 +44,16 @@ public class UtenteController {
         this.utenteService.findUtenteByIdAndDelete(idUtente);
     }
 
-    @PutMapping("/{idUtente}")
-    public Utente findUtenteByIdAndUpdate (@PathVariable UUID idUtente,@RequestBody @Validated UpdateUtenteDTO body, BindingResult validationResult)
-    {
-        if(validationResult.hasErrors()){
-            throw new ValidationException(validationResult.getFieldErrors()
-                    .stream().map(fieldError -> fieldError.getDefaultMessage()).toList());
-        } else{
-            return this.utenteService.findUtenteByIdAndUpdate(idUtente,body);
-        }
-    }
+//    @PutMapping("/{idUtente}")
+//    public Utente findUtenteByIdAndUpdate (@PathVariable UUID idUtente,@RequestBody @Validated UpdateUtenteDTO body, BindingResult validationResult)
+//    {
+//        if(validationResult.hasErrors()){
+//            throw new ValidationException(validationResult.getFieldErrors()
+//                    .stream().map(fieldError -> fieldError.getDefaultMessage()).toList());
+//        } else{
+//            return this.utenteService.findUtenteByIdAndUpdate(idUtente,body);
+//        }
+//    }
 
     @GetMapping("/me")
     public Utente trovaIlMioProfilo(@AuthenticationPrincipal Utente currentAuthenticatedUtente)

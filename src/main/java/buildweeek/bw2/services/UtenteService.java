@@ -49,7 +49,35 @@ public class UtenteService {
         System.out.println("L'utente: "+ payload.username()+ "con email: "+ payload.email() +" è stato salvato correttamente");
         return savedNewUtente;
     }
+//patch solo per il ruolo con authority solo admin
+    // rifare update
+    
 
+//    public Utente findUtenteByIdAndUpdate (UUID idUtente, UpdateUtenteDTO payload)
+//    {
+//        Utente found =findUtenteById(idUtente);
+//        if (!found.getEmail().equals(payload.email()))
+//            this.utenteRepository.findByEmail(payload.email()).ifPresent(utente -> {
+//                throw new BadRequestException("L'email " + utente.getEmail() + " appartiene già ad un'altro utente");
+//            });
+//
+//        if(!payload.username().isEmpty()) found.setUsername(payload.username());
+//        if(!payload.email().isEmpty()) found.setEmail(payload.email());
+//        if(!payload.password().isEmpty()) found.setPassword(bcrypt.encode(payload.password()));
+//        if(!payload.nome().isEmpty()) found.setNome(payload.nome());
+//        if(!payload.cognome().isEmpty()) found.setCognome(payload.cognome());
+//        if (payload.passwordAdmin().equals("1234")){
+//            if(payload.ruolo().equals("ADMIN") || payload.ruolo().equals("admin"))
+//            {
+//                Ruolo ruoloADMIN = new Ruolo("ADMIN");
+//                found.getRuoli().add(ruoloADMIN);
+//            }else if (!payload.ruolo().isEmpty())throw new BadRequestException("Il ruolo inserito non è valido");
+//        }
+//
+//        Utente utenteModificato = this.utenteRepository.save(found);
+//        System.out.println("Utente modificato correttamente");
+//        return utenteModificato;
+//    }
     public Utente findByEmail(String email) {
         return this.utenteRepository.findByEmail(email).orElseThrow(() -> new NotFoundException("Il dipendente con l'email " + email + " non è stato trovato!"));
     }
@@ -61,32 +89,6 @@ public class UtenteService {
 
     public Utente findUtenteById(UUID idUtente) {
         return this.utenteRepository.findById(idUtente).orElseThrow(()-> new NotFoundException(idUtente));
-    }
-
-    public Utente findUtenteByIdAndUpdate (UUID idUtente, UpdateUtenteDTO payload)
-    {
-        Utente found =findUtenteById(idUtente);
-        if (!found.getEmail().equals(payload.email()))
-            this.utenteRepository.findByEmail(payload.email()).ifPresent(utente -> {
-                throw new BadRequestException("L'email " + utente.getEmail() + " appartiene già ad un'altro utente");
-            });
-
-        if(!payload.username().isEmpty()) found.setUsername(payload.username());
-        if(!payload.email().isEmpty()) found.setEmail(payload.email());
-        if(!payload.password().isEmpty()) found.setPassword(bcrypt.encode(payload.password()));
-        if(!payload.nome().isEmpty()) found.setNome(payload.nome());
-        if(!payload.cognome().isEmpty()) found.setCognome(payload.cognome());
-        if (payload.passwordAdmin().equals("1234")){
-            if(payload.ruolo().equals("ADMIN") || payload.ruolo().equals("admin"))
-            {
-                Ruolo ruoloADMIN = new Ruolo("ADMIN");
-                found.getRuoli().add(ruoloADMIN);
-            }else if (!payload.ruolo().isEmpty())throw new BadRequestException("Il ruolo inserito non è valido");
-        }
-
-        Utente utenteModificato = this.utenteRepository.save(found);
-        System.out.println("Utente modificato correttamente");
-        return utenteModificato;
     }
 
     public String uploadAvatar(UUID idUtente, MultipartFile file) {
