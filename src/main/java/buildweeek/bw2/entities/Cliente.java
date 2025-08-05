@@ -61,7 +61,7 @@ public class Cliente {
     @JoinColumn(name = "id_cliente")
     private List<Fattura> fatture;
 
-    public Cliente(String email, String pec, String telefono, String partitaIva, String ragioneSociale, LocalDate dataInserimento, LocalDate dataUltimoContatto, double fatturatoAnnuale, String emailContatto, String nomeContatto, String cognomeContatto, String telefonoContatto, String logoAziendaleURL, CustomerType customerType) {
+    public Cliente(String email, String pec, String telefono, String partitaIva, String ragioneSociale, LocalDate dataInserimento, LocalDate dataUltimoContatto, double fatturatoAnnuale, String emailContatto, String nomeContatto, String cognomeContatto, String telefonoContatto, CustomerType customerType) {
         this.email = email;
         this.pec = pec;
         this.telefono = telefono;
@@ -74,7 +74,6 @@ public class Cliente {
         this.nomeContatto = nomeContatto;
         this.cognomeContatto = cognomeContatto;
         this.telefonoContatto = telefonoContatto;
-        this.logoAziendaleURL = logoAziendaleURL;
         this.customerType = customerType;
     }
 

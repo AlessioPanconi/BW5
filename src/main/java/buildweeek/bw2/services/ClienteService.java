@@ -46,35 +46,29 @@ public class ClienteService {
             LocalDate dataInserimento = LocalDate.parse(payload.dataInserimento());
             LocalDate dataUltimoContatto = LocalDate.parse(payload.dataUltimoContatto());
 
-        String customerTypeStr = payload.customerType();
-        CustomerType type = null;
+            String customerTypeStr = payload.customerType();
+            CustomerType type = null;
 
-        if ("PA".equals(customerTypeStr.toUpperCase())) {
-            type = CustomerType.PA;
-        } else if ("SAS".equals(customerTypeStr.toUpperCase())) {
-            type = CustomerType.SAS;
-        } else if ("SPA".equals(customerTypeStr.toUpperCase())) {
-            type = CustomerType.SPA;
-        } else if ("SRL".equals(customerTypeStr.toUpperCase())) {
+            if ("PA".equals(customerTypeStr.toUpperCase())) {
+                type = CustomerType.PA;
+            } else if ("SAS".equals(customerTypeStr.toUpperCase())) {
+                type = CustomerType.SAS;
+            } else if ("SPA".equals(customerTypeStr.toUpperCase())) {
+                type = CustomerType.SPA;
+            } else if ("SRL".equals(customerTypeStr.toUpperCase())) {
             type = CustomerType.SRL;
-        } else {
-            throw new BadRequestException("Inerisci un tipo di cliente valido!");
-        }
-        Cliente newCliente = new Cliente(payload.email(), payload.pec(), payload.telefono(), payload.partitaIva(), payload.ragioneSociale(),
-                dataInserimento, dataUltimoContatto, payload.fatturatoAnnuale(), payload.emailContatto(),
-                payload.nomeContatto(), payload.cognomeContatto(), payload.telefonoContatto(), type);
+            } else {
+                throw new BadRequestException("Inerisci un tipo di cliente valido!");
+            }
+
+            Cliente newCliente = new Cliente(payload.email(),payload.pec(), payload.telefono(), payload.partitaIva(), payload.ragioneSociale(), dataInserimento,dataUltimoContatto, payload.fatturatoAnnuale(), payload.emailContatto(), payload.nomeContatto(), payload.cognomeContatto(), payload.telefonoContatto(),type);
+            Cliente savedCliente = this.clienteRepository.save(newCliente);
+            return newCliente;
 
         } catch (DateTimeParseException e) {
             throw new BadRequestException("Il formato della data inserita non è valido. Il formato corretto è yyyy-mm-dd.");
         }
 
-
-
-
     }
-
-    Cliente savedCliente = this.clienteRepository.save(newCliente);
-
-    return newCliente;
 
 }
