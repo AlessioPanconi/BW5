@@ -30,31 +30,53 @@ public class Runner implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         String filePath = "src/main/java/buildweeek/bw2/csv/province-italiane.csv";
+        String filePath2 = "src/main/java/buildweeek/bw2/csv/comuni-italiani.csv";
         String line;
         String cvsSplitBy = ";";
 
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
-            br.readLine(); // Salta intestazione se presente
+            br.readLine();
             while ((line = br.readLine()) != null) {
                 if (line.trim().isEmpty()) continue;
                 String[] data = line.split(cvsSplitBy);
-                inserisciInDatabase(data);
+                inserisciInDatabaseProvince(data);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath2))) {
+            br.readLine();
+            while ((line = br.readLine()) != null) {
+                if (line.trim().isEmpty()) continue;
+                String[] data = line.split(cvsSplitBy);
+                inserisciInDatabaseComuni(data);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public void inserisciInDatabase(String[] data) {
+    public void inserisciInDatabaseProvince(String[] data) {
         try(Connection conn = DriverManager.getConnection(dbURL, user, pass)) {
-            String sql = "INSERT INTO provincia (id_provincia, sigla, provincia, regione) VALUES (?, ?, ?, ?)";
+            String sql = "INSERT INTO provincia (provincia , sigla , regione) VALUES (?, ?, ?) ON CONFLICT DO NOTHING";
             try (PreparedStatement ps = conn.prepareStatement(sql)) {
-                UUID uuid = UUID.randomUUID();
+                ps.setString(1, data[1]);
+                ps.setString(2, data[0]);
+                ps.setString(3, data[2]);
+                ps.executeUpdate();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
-                ps.setObject(1, uuid);
-                ps.setString(2, data[0]); // sigla
-                ps.setString(3, data[1]); // provincia
-                ps.setString(4, data[2]); // regione
+    public void inserisciInDatabaseComuni(String[] data) {
+        try(Connection conn = DriverManager.getConnection(dbURL, user, pass)) {
+            String sql = "INSERT INTO comune (comune, provincia) VALUES (?, ?) ON CONFLICT DO NOTHING";
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setString(1, data[2]);
+                ps.setString(2, data[3]);
                 ps.executeUpdate();
             }
         } catch (SQLException e) {

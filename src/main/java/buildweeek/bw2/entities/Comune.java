@@ -16,23 +16,19 @@ import java.util.UUID;
 public class Comune {
 
     @Id
-    @Column(name = "id_comune")
-    private UUID idComune;
-    private String nome;
+    private String comune;
 
     @OneToMany
     @JoinColumn(name = "id_comune")
     private List<Indirizzo> indirizzi;
 
-    public Comune(String nome) {
-        this.nome = nome;
+    @ManyToOne
+    @JoinColumn(name = "provincia")
+    private Provincia provincia;
+
+    public Comune(String comune, Provincia provincia) {
+        this.comune = comune;
+        this.provincia = provincia;
     }
 
-    @Override
-    public String toString() {
-        return "Comune{" +
-                "idComune=" + idComune +
-                ", nome='" + nome + '\'' +
-                '}';
-    }
 }
