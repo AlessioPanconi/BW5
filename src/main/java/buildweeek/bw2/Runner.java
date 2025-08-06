@@ -1,8 +1,5 @@
 package buildweeek.bw2;
 
-import com.opencsv.CSVParserBuilder;
-import com.opencsv.CSVReader;
-import com.opencsv.CSVReaderBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -10,11 +7,7 @@ import org.springframework.stereotype.Component;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.UUID;
+import java.sql.*;
 
 
 @Component
@@ -72,16 +65,32 @@ public class Runner implements CommandLineRunner {
     }
 
     public void inserisciInDatabaseComuni(String[] data) {
-        try(Connection conn = DriverManager.getConnection(dbURL, user, pass)) {
-            String sql = "INSERT INTO comune (comune, provincia) VALUES (?, ?) ON CONFLICT DO NOTHING";
-            try (PreparedStatement ps = conn.prepareStatement(sql)) {
-                ps.setString(1, data[2]);
-                ps.setString(2, data[3]);
-                ps.executeUpdate();
+        String nomeComuneCsv = data[2].trim();
+        String nomeProvinciaCsv = data[3].trim();
+
+        try (Connection conn = DriverManager.getConnection(dbURL, user, pass)) {
+            String SQLQueryForFindProvinciaNelDb = "SELECT provincia FROM provincia WHERE provincia ILIKE ?";
+            try (PreparedStatement checkStmt = conn.prepareStatement(SQLQueryForFindProvinciaNelDb)) {
+                checkStmt.setString(1, nomeProvinciaCsv);
+
+                ResultSet rs = checkStmt.executeQuery();
+
+                if (rs.next()) {
+                    String provinciaTrovata = rs.getString("provincia");
+                    String sqlInsertComune = "INSERT INTO comune (comune, provincia) VALUES (?, ?)";
+                    try (PreparedStatement insertStmt = conn.prepareStatement(sqlInsertComune)) {
+                        insertStmt.setString(1, nomeComuneCsv);
+                        insertStmt.setString(2, provinciaTrovata);
+                        insertStmt.executeUpdate();
+                    }
+                } else {
+                    System.out.println("⚠ Provincia non trovata per il comune: " + nomeComuneCsv + " (Provincia CSV: " + nomeProvinciaCsv + ")");
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
+
 }
 
