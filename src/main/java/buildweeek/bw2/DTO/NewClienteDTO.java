@@ -28,8 +28,8 @@ public record NewClienteDTO(
         @NotEmpty(message = "L'email del contatto è obbligatoria!")
         @Email(message = "L'email del contatto inserito non è nel formato giusto")
         String emailContatto,
-        @NotEmpty(message = "Il nome del contatto è obbligatorio!")
-        @Size(min = 2, max = 30, message = "Il nome deve essere compreso tra i 2 e i 30 caratteri!")
+        @NotEmpty(message = "Il provincia del contatto è obbligatorio!")
+        @Size(min = 2, max = 30, message = "Il provincia deve essere compreso tra i 2 e i 30 caratteri!")
         String nomeContatto,
         @NotEmpty(message = "Il cognome del contatto è obbligatorio!")
         @Size(min = 2, max = 30, message = "Il cognome deve essere compreso tra i 2 e i 30 caratteri!")

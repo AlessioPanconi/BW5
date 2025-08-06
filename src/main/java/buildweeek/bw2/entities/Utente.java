@@ -1,6 +1,7 @@
 package buildweeek.bw2.entities;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -20,7 +21,7 @@ import java.util.stream.Collectors;
 @Getter
 @Setter
 @NoArgsConstructor
-//@JsonIgnoreProperties({"password","authorities","enabled","accountNonExpired","credentialsNonExpired","accountNonLocked"})
+@JsonIgnoreProperties({"password","authorities","enabled","accountNonExpired","credentialsNonExpired","accountNonLocked"})
 public class Utente implements UserDetails{
 
     @Id
@@ -63,7 +64,7 @@ public class Utente implements UserDetails{
                 ", username='" + username + '\'' +
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
-                ", nome='" + nome + '\'' +
+                ", provincia='" + nome + '\'' +
                 ", cognome='" + cognome + '\'' +
                 '}';
     }

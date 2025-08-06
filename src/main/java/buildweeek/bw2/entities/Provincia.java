@@ -16,26 +16,27 @@ import java.util.UUID;
 public class Provincia {
 
     @Id
-    @GeneratedValue
     @Column(name = "id_provincia")
     private UUID idProvincia;
-    private String nome;
     private String sigla;
+    private String provincia;
+    private String regione;
 
     @OneToMany
     @JoinColumn(name = "id_provincia")
     private List<Comune> comuni;
 
-    public Provincia(String nome, String sigla) {
-        this.nome = nome;
+    public Provincia(String provincia, String sigla, String regione) {
         this.sigla = sigla;
+        this.provincia = provincia;
+        this.regione = regione;
     }
 
     @Override
     public String toString() {
         return "Provincia{" +
                 "idProvincia=" + idProvincia +
-                ", nome='" + nome + '\'' +
+                ", provincia='" + provincia + '\'' +
                 ", sigla='" + sigla + '\'' +
                 '}';
     }

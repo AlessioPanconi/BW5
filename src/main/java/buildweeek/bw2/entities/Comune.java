@@ -16,7 +16,6 @@ import java.util.UUID;
 public class Comune {
 
     @Id
-    @GeneratedValue
     @Column(name = "id_comune")
     private UUID idComune;
     private String nome;
