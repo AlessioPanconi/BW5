@@ -22,6 +22,7 @@ public class Runner implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+
         String filePath = "src/main/java/buildweeek/bw2/csv/province-italiane.csv";
         String filePath2 = "src/main/java/buildweeek/bw2/csv/comuni-italiani.csv";
         String line;
@@ -65,32 +66,62 @@ public class Runner implements CommandLineRunner {
     }
 
     public void inserisciInDatabaseComuni(String[] data) {
+
         String nomeComuneCsv = data[2].trim();
         String nomeProvinciaCsv = data[3].trim();
 
+        if (nomeProvinciaCsv.equalsIgnoreCase("Valle d'Aosta/Vallée d'Aoste")) {
+            nomeProvinciaCsv = "Aosta";
+        } else if (nomeProvinciaCsv.equalsIgnoreCase("Verbano-Cusio-Ossola")) {
+            nomeProvinciaCsv = "Verbania";
+        }else if (nomeProvinciaCsv.equalsIgnoreCase("Monza e della Brianza")) {
+            nomeProvinciaCsv = "Monza-Brianza";
+        } else if (nomeProvinciaCsv.equalsIgnoreCase("Bolzano/Bozen")) {
+            nomeProvinciaCsv = "Bolzano";
+        } else if (nomeProvinciaCsv.equalsIgnoreCase("La Spezia")) {
+            nomeProvinciaCsv = "La-Spezia";
+        } else if (nomeProvinciaCsv.equalsIgnoreCase("Reggio nell'Emilia")) {
+            nomeProvinciaCsv = "Reggio-Emilia";
+        }else if (nomeProvinciaCsv.equalsIgnoreCase("Forlì-Cesena")) {
+            nomeProvinciaCsv = "Forli-Cesena";
+        }else if (nomeProvinciaCsv.equalsIgnoreCase("Pesaro e Urbino")) {
+            nomeProvinciaCsv = "Pesaro-Urbino";
+        }else if (nomeProvinciaCsv.equalsIgnoreCase("Ascoli Piceno")) {
+            nomeProvinciaCsv = "Ascoli-Piceno";
+        }else if (nomeProvinciaCsv.equalsIgnoreCase("Reggio Calabria")) {
+            nomeProvinciaCsv = "Reggio-Calabria";
+        }else if (nomeProvinciaCsv.equalsIgnoreCase("Vibo Valentia")) {
+            nomeProvinciaCsv = "Vibo-Valentia";
+        }else if (nomeProvinciaCsv.equalsIgnoreCase("Sud Sardegna")) {
+            nomeProvinciaCsv = "Cagliari";
+        }
+
         try (Connection conn = DriverManager.getConnection(dbURL, user, pass)) {
-            String SQLQueryForFindProvinciaNelDb = "SELECT provincia FROM provincia WHERE provincia ILIKE ?";
-            try (PreparedStatement checkStmt = conn.prepareStatement(SQLQueryForFindProvinciaNelDb)) {
-                checkStmt.setString(1, nomeProvinciaCsv);
+            String provinciaTrovata = null;
 
-                ResultSet rs = checkStmt.executeQuery();
-
-                if (rs.next()) {
-                    String provinciaTrovata = rs.getString("provincia");
-                    String sqlInsertComune = "INSERT INTO comune (comune, provincia) VALUES (?, ?)";
-                    try (PreparedStatement insertStmt = conn.prepareStatement(sqlInsertComune)) {
-                        insertStmt.setString(1, nomeComuneCsv);
-                        insertStmt.setString(2, provinciaTrovata);
-                        insertStmt.executeUpdate();
-                    }
-                } else {
-                    System.out.println("⚠ Provincia non trovata per il comune: " + nomeComuneCsv + " (Provincia CSV: " + nomeProvinciaCsv + ")");
-                }
+            String sqlProvincia = "SELECT provincia FROM provincia WHERE provincia ILIKE ?";
+            try (PreparedStatement ps = conn.prepareStatement(sqlProvincia)) {
+                ps.setString(1, "%" + nomeProvinciaCsv + "%");
+                ResultSet rs = ps.executeQuery();
+                if (rs.next()) provinciaTrovata = rs.getString("provincia");
             }
+
+            if (provinciaTrovata != null) {
+                String sqlInsert = "INSERT INTO comune (comune, provincia) VALUES (?, ?) ON CONFLICT DO NOTHING";
+                try (PreparedStatement insertStmt = conn.prepareStatement(sqlInsert)) {
+                    insertStmt.setString(1, nomeComuneCsv);
+                    insertStmt.setString(2, provinciaTrovata);
+                    insertStmt.executeUpdate();
+                }
+            } else {
+                System.out.println("Provincia non trovata per: " + nomeProvinciaCsv);
+            }
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
+
 
 }
 
