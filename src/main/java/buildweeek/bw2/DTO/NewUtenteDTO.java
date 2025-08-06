@@ -16,7 +16,7 @@ public record NewUtenteDTO(
         @Pattern(regexp = "^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{4,}$", message = "La password deve contenere: 1 carat maiuscolo, uno minuscolo.....")
         @Size(min = 6)
         String password,
-        @NotEmpty(message =  "Il nome è obbligatorio")
+        @NotEmpty(message =  "Il provincia è obbligatorio")
         String nome,
         @NotEmpty(message =  "Il cognome è obbligatorio")
         String cognome

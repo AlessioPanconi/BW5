@@ -56,7 +56,6 @@ public class Cliente {
     @JoinColumn(name = "id_cliente")
     private List<Indirizzo> indirizzi;
 
-
     @OneToMany
     @JoinColumn(name = "id_cliente")
     private List<Fattura> fatture;

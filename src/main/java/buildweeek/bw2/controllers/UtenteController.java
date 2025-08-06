@@ -56,7 +56,7 @@ public class UtenteController {
 
     @GetMapping("/{idUtente}")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public Utente getDipendenteById(@PathVariable UUID idUtente) {
+    public Utente getUtenteById(@PathVariable UUID idUtente) {
         return this.utenteService.findUtenteById(idUtente);
     }
 
