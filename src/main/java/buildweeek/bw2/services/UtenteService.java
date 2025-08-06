@@ -6,6 +6,7 @@ import buildweeek.bw2.entities.Ruolo;
 import buildweeek.bw2.entities.Utente;
 import buildweeek.bw2.exceptions.BadRequestException;
 import buildweeek.bw2.exceptions.NotFoundException;
+import buildweeek.bw2.repositories.RuoloRepository;
 import buildweeek.bw2.repositories.UtenteRepository;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
@@ -29,6 +30,9 @@ public class UtenteService {
 
     @Autowired
     private UtenteRepository utenteRepository;
+
+    @Autowired
+    private RuoloRepository ruoloRepository;
 
     @Autowired
     private PasswordEncoder bcrypt;
@@ -57,27 +61,34 @@ public class UtenteService {
         });
 
         String avatarUrl = "https://ui-avatars.com/api/?name=" + payload.nome() + "+" + payload.cognome();
+        Ruolo ruoloUtente = this.ruoloRepository.findByNomeRuolo("UTENTE").orElseThrow(() -> new NotFoundException("Ruolo UTENTE non trovato"));
         List<Ruolo> listRuoli = new ArrayList<>();
-        Ruolo ruoloUtente = new Ruolo("UTENTE");
         listRuoli.add(ruoloUtente);
-        Utente newUtente =  new Utente(payload.username(), payload.email(),bcrypt.encode(payload.password()), payload.nome(), payload.cognome(),avatarUrl,listRuoli);
+        Utente newUtente =  new Utente(payload.username(), payload.email(),bcrypt.encode(payload.password()), payload.nome(),
+                payload.cognome(),avatarUrl, listRuoli);
         Utente savedNewUtente = this.utenteRepository.save(newUtente);
         System.out.println("L'utente: "+ payload.username()+ "con email: "+ payload.email() +" è stato salvato correttamente");
         return savedNewUtente;
     }
 
-    public void findUtenteByIdAndPatchRuolo (UUID idUtente)
+    public Utente findUtenteByIdAndPatchRuolo (UUID idUtente)
     {
         Utente found =findUtenteById(idUtente);
-        Ruolo ruoloADMIN = new Ruolo("ADMIN");
+
+        if (found.getRuoli().stream().anyMatch(ruolo -> ruolo.getNomeRuolo().equals("ADMIN"))) throw new BadRequestException("L'Utente è gia ADMIN!");
+
+        Ruolo ruoloADMIN = this.ruoloRepository.findByNomeRuolo("ADMIN").orElseThrow(() -> new NotFoundException("Ruolo ADMIN non trovato"));
         found.getRuoli().add(ruoloADMIN);
         this.utenteRepository.save(found);
+        return found;
     }
 
     public void findUtenteByIdAndRemoveAdmin (UUID idUtente)
     {
         Utente found = findUtenteById(idUtente);
-        List<Ruolo> nuoviRuoli = found.getRuoli().stream().filter(ruolo -> !ruolo.equals("ADMIN")).toList();
+        if (!found.getRuoli().stream().anyMatch(ruolo -> ruolo.getNomeRuolo().equals("ADMIN"))) throw new BadRequestException("L'Utente non è ADMIN!");
+
+        List<Ruolo> nuoviRuoli = found.getRuoli().stream().filter(ruolo -> !ruolo.getNomeRuolo().equals("ADMIN")).collect(Collectors.toList());
         found.setRuoli(nuoviRuoli);
         this.utenteRepository.save(found);
     }

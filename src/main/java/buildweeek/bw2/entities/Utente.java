@@ -37,7 +37,7 @@ public class Utente implements UserDetails{
     @Column(name = "avatar_url")
     private String avatarUrl;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "utente_ruolo",
             joinColumns = @JoinColumn(name = "id_utente", nullable = false),

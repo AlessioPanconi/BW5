@@ -59,6 +59,10 @@ public class ClienteService {
             LocalDate dataInserimento = LocalDate.parse(payload.dataInserimento());
             LocalDate dataUltimoContatto = LocalDate.parse(payload.dataUltimoContatto());
 
+            if(dataInserimento.isAfter(LocalDate.now())) throw new BadRequestException("La data di inserimento non può essere dopo oggi!");
+            if(dataUltimoContatto.isAfter(LocalDate.now()) && dataUltimoContatto.isBefore(dataInserimento))
+                throw new BadRequestException("La data di ultimo contatto non può essere dopo oggi o prima della data di inserimento!");
+
             String customerTypeStr = payload.customerType();
             CustomerType type = null;
 
@@ -107,6 +111,10 @@ public class ClienteService {
         try {
             LocalDate dataInserimento = LocalDate.parse(payload.dataInserimento());
             LocalDate dataUltimoContatto = LocalDate.parse(payload.dataUltimoContatto());
+
+            if(dataInserimento.isAfter(LocalDate.now())) throw new BadRequestException("La data di inserimento non può essere dopo oggi!");
+            if(dataUltimoContatto.isAfter(LocalDate.now()) && dataUltimoContatto.isBefore(dataInserimento))
+                throw new BadRequestException("La data di ultimo contatto non può essere dopo oggi o prima della data di inserimento!");
 
             String customerTypeStr = payload.customerType();
             CustomerType type = null;
@@ -168,6 +176,8 @@ public class ClienteService {
         List<Cliente> clientiFiltrati = clienti.stream()
                 .filter(cliente -> cliente.getFatturatoAnnuale() >= payload.fatturatoAnnuale()).toList();
 
+        if(clientiFiltrati.isEmpty()) throw new NotFoundException("Non ci sono clienti con fatturato maggiore di: " + payload.fatturatoAnnuale());
+
         return clientiFiltrati;
     }
 
@@ -176,6 +186,9 @@ public class ClienteService {
         List<Cliente> clienti = this.clienteRepository.findAll();
         List<Cliente> clientiFiltrati = clienti.stream()
                 .filter(cliente -> cliente.getFatturatoAnnuale() < payload.fatturatoAnnuale()).toList();
+
+        if(clientiFiltrati.isEmpty()) throw new NotFoundException("Non ci sono clienti con fatturato minore di: " + payload.fatturatoAnnuale());
+
 
         return clientiFiltrati;
     }
@@ -188,6 +201,9 @@ public class ClienteService {
 
             List<Cliente> clientiFiltrati = clienti.stream()
                     .filter(cliente -> cliente.getDataInserimento().isBefore(dataInserimento)).toList();
+
+            if(clientiFiltrati.isEmpty()) throw new NotFoundException("Non ci sono clienti inseriti prima di: " + payload.dataInserimento());
+
 
             return clientiFiltrati;
 
@@ -205,6 +221,9 @@ public class ClienteService {
             List<Cliente> clientiFiltrati = clienti.stream()
                     .filter(cliente -> cliente.getDataInserimento().isAfter(dataInserimento)).toList();
 
+            if(clientiFiltrati.isEmpty()) throw new NotFoundException("Non ci sono clienti inseriti dopo di: " + payload.dataInserimento());
+
+
             return clientiFiltrati;
 
         } catch (DateTimeParseException e) {
@@ -221,7 +240,11 @@ public class ClienteService {
             List<Cliente> clientiFiltrati = clienti.stream()
                     .filter(cliente -> cliente.getDataUltimoContatto().isEqual(dataInserimento)).toList();
 
+            if(clientiFiltrati.isEmpty()) throw new NotFoundException("Non ci sono clienti contattati il giorno: " + payload.dataUltimoContatto());
+
             return clientiFiltrati;
+
+
 
         } catch (DateTimeParseException e) {
             throw new BadRequestException("Il formato della data inserita non è valido. Il formato corretto è yyyy-mm-dd.");
@@ -230,11 +253,11 @@ public class ClienteService {
 
     public List<Cliente> findClientiByPartialName(PartialNameDTO payload)
     {
-        List<Cliente> clienti = this.clienteRepository.findAll();
+        List<Cliente> clientiTrovati = this.clienteRepository.findByNomeContattoContainingIgnoreCase(payload.nomeContatto());
 
-        List<Cliente> clientiFiltrati = clienti.stream()
-                .filter(cliente -> cliente.getNomeContatto().contains(payload.nomeContatto())).toList();
-        return clientiFiltrati;
+        if(clientiTrovati.isEmpty()) throw new NotFoundException("Nessun cliente trovato!");
+
+       return clientiTrovati;
     }
 
 }

@@ -6,6 +6,7 @@ import buildweeek.bw2.entities.Utente;
 import buildweeek.bw2.exceptions.UnauthorizedException;
 import buildweeek.bw2.tools.JWTTools;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -17,10 +18,13 @@ public class AutenticazioneService {
         @Autowired
         private JWTTools jwtTools;
 
+       @Autowired
+       private PasswordEncoder bcrypt;
+
         public String checkAccessAndGenerateToken(UtenteLoginDTO body)
         {
             Utente found = this.utenteService.findByEmail(body.email());
-            if (found.getPassword().equals(body.password())) {
+            if (bcrypt.matches(body.password(), found.getPassword())) {
                 String accessToken = jwtTools.createTokenUtente(found);
                 return accessToken;
             } else {

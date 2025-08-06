@@ -17,4 +17,5 @@ public interface ClienteRepository extends JpaRepository<Cliente, UUID> {
     Optional<Cliente> findByTelefono(String telefono);
     Optional<Cliente> findByPartitaIva(String partitaIva);
 
+    List<Cliente> findByNomeContattoContainingIgnoreCase(String nomeContatto);
 }

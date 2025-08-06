@@ -3,6 +3,7 @@ package buildweeek.bw2.DTO;
 import buildweeek.bw2.enums.CustomerType;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public record NewClienteDTO(
@@ -23,7 +24,7 @@ public record NewClienteDTO(
         String dataInserimento,
         @NotEmpty(message = "La data di ultimo contatto è obbligatoria!")
         String dataUltimoContatto,
-        @NotEmpty(message = "Il fatturato annuale è obbligatorio!")
+        @NotNull(message = "Il fatturato annuale è obbligatorio!")
         double fatturatoAnnuale,
         @NotEmpty(message = "L'email del contatto è obbligatoria!")
         @Email(message = "L'email del contatto inserito non è nel formato giusto")
