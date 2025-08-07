@@ -200,10 +200,9 @@ public class ClienteService {
         return this.clienteRepository.findAll(pageable);
     }
 
-//    public Page<Cliente> findByProvinciaSL(int pageNumber, int pageSize) {
-//        Pageable pageable = PageRequest.of(pageNumber, pageSize);
-//        return clienteRepository.findClientiAndOrderByProvinciaOfIndirizzoSL(pageable);
-//    }
+    public List<Cliente> findByProvinciaSL() {
+        return clienteRepository.findAllOrderByProvinciaSedeLegale();
+    }
 
 
     public List<Cliente> findClientiByFatturatoMaggiore(FatturatoAnnualeDTO payload)

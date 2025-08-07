@@ -32,20 +32,4 @@ public class AutenticazioneController {
         String token = autenticazioneService.checkAccessAndGenerateToken(body);
         return new LoginUtenteRespDTO(token);
     }
-
-    @PostMapping("/registerAdmin")
-    @ResponseStatus(HttpStatus.CREATED)
-    public Utente createUtente(@RequestBody @Validated NewUtenteDTO body, BindingResult validationResult) {
-        if (validationResult.hasErrors()) {
-            throw new ValidationException(validationResult.getFieldErrors()
-                    .stream().map(fieldError -> fieldError.getDefaultMessage()).toList());
-        } else {
-            return this.utenteService.saveUtente(body);
-        }
-    }
-
-    @PatchMapping("/{idUtente}/addRole")
-    public void findUtenteByAndPatchRole(@PathVariable UUID idUtente) {
-        this.utenteService.findUtenteByIdAndPatchRuolo(idUtente);
-    }
 }

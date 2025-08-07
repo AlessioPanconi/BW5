@@ -156,12 +156,16 @@ public class UtenteController {
     // Sezione cliente
 
     @PostMapping("/cliente")
-    public Cliente saveCliente(@RequestBody @Validated NewClienteDTO payloadCliente, @RequestBody @Validated NewIndirizzoSedeLegaleDTO payloadIndirizzoSL, @RequestBody @Validated NewIndirizzoSedeOperativaDTO payloadIndirizzoSO, BindingResult validationResult) {
+    public Cliente saveCliente(@RequestBody ClienteRequestDTO clienteRequestDTO, BindingResult validationResult) {
         if (validationResult.hasErrors()) {
             throw new ValidationException(validationResult.getFieldErrors()
                     .stream().map(fieldError -> fieldError.getDefaultMessage()).toList());
         } else {
-            return this.clienteService.saveCliente(payloadCliente,payloadIndirizzoSL,payloadIndirizzoSO);
+            NewClienteDTO clienteDTO = clienteRequestDTO.getCliente();
+            NewIndirizzoSedeLegaleDTO indirizzoSedeLegaleDTO = clienteRequestDTO.getSedeLegale();
+            NewIndirizzoSedeOperativaDTO indirizzoSedeOperativaDTO = clienteRequestDTO.getSedeOperativa();
+
+            return this.clienteService.saveCliente(clienteDTO, indirizzoSedeLegaleDTO, indirizzoSedeOperativaDTO);
         }
     }
 
@@ -275,11 +279,11 @@ public class UtenteController {
         return this.clienteService.findAllReverse(pageNumber, pageSize, "dataUltimoContatto");
     }
 
-//    @GetMapping("/cliente/sortByProvinciaIndirizzoSL")
-//    @PreAuthorize("hasAuthority('ADMIN')")
-//    public Page<Cliente> getPageClientiByProvinciaIndirizzoSL(@RequestParam(defaultValue = "0") int pageNumber, @RequestParam(defaultValue = "10") int pageSize) {
-//        return this.clienteService.findByProvinciaSL(pageNumber, pageSize);
-//    }
+    @GetMapping("/cliente/sortByProvinciaIndirizzoSL")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public List<Cliente> getPageClientiByProvinciaIndirizzoSL() {
+        return this.clienteService.findByProvinciaSL();
+    }
 
     //SEZIONE ADMIN GESTIONE INDIRIZZI
 

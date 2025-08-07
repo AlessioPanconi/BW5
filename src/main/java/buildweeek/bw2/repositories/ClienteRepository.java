@@ -24,4 +24,14 @@ public interface ClienteRepository extends JpaRepository<Cliente, UUID> {
 
 //    @Query("SELECT c FROM CLIENTE c JOIN c.indirizzo i JOIN i.provincia p ORDER BY p.provincia ASC")
 //    Page<Cliente> findClientiAndOrderByProvinciaOfIndirizzoSL(Pageable pageable);
+
+    @Query("""
+        SELECT c
+        FROM Cliente c
+        JOIN c.indirizzi i
+        JOIN i.provincia p
+        WHERE i.indirizzoType = buildweeek.bw2.enums.IndirizzoType.SEDELEGALE
+        ORDER BY p.provincia
+    """)
+    List<Cliente> findAllOrderByProvinciaSedeLegale();
 }
