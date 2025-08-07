@@ -285,7 +285,7 @@ public class UtenteController {
             throw new ValidationException(validationResult.getFieldErrors()
                     .stream().map(fieldError -> fieldError.getDefaultMessage()).toList());
         } else {
-            return this.indirizzoService.findClienteByIdAndUpdateIndirizzoSL(clienteId,body);
+            return this.clienteService.findClienteByIdAndUpdateIndirizzoSL(clienteId,body);
         }
     }
 
@@ -297,7 +297,7 @@ public class UtenteController {
             throw new ValidationException(validationResult.getFieldErrors()
                     .stream().map(fieldError -> fieldError.getDefaultMessage()).toList());
         } else {
-            return this.indirizzoService.findClienteByIdAndUpdateIndirizzoSO(clienteId,body);
+            return this.clienteService.findClienteByIdAndUpdateIndirizzoSO(clienteId,body);
         }
     }
 

@@ -24,7 +24,6 @@ public class Indirizzo {
     private String via;
     private String civico;
     private String localita;
-    private Provincia provincia;
     @Setter(AccessLevel.NONE)
     @Enumerated(EnumType.STRING)
     private IndirizzoType indirizzoType;
@@ -33,6 +32,9 @@ public class Indirizzo {
     @ManyToOne
     @JoinColumn(name = "comune")
     private Comune comune;
+    @ManyToOne
+    @JoinColumn(name = "provincia_id")
+    private Provincia provincia;
 
     public Indirizzo(String via, String civico, String localita, int cap, Comune comune,IndirizzoType indirizzoType, Provincia provincia) {
         this.via = via;

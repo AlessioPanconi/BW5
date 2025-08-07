@@ -67,7 +67,7 @@ public class UtenteService {
         Utente newUtente =  new Utente(payload.username(), payload.email(),bcrypt.encode(payload.password()), payload.nome(),
                 payload.cognome(),avatarUrl, listRuoli);
         Utente savedNewUtente = this.utenteRepository.save(newUtente);
-        System.out.println("L'utente: "+ payload.username()+ "con email: "+ payload.email() +" è stato salvato correttamente");
+        System.out.println("L'utente: "+ payload.username()+ " con email: "+ payload.email() +" è stato salvato correttamente");
         return savedNewUtente;
     }
 

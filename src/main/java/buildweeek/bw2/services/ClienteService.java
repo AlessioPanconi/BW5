@@ -26,6 +26,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -287,6 +288,66 @@ public class ClienteService {
         if(clientiTrovati.isEmpty()) throw new NotFoundException("Nessun cliente trovato!");
 
        return clientiTrovati;
+    }
+
+    public Indirizzo findClienteByIdAndUpdateIndirizzoSL(UUID idCliente, NewIndirizzoSedeLegaleDTO payload)
+    {
+        Cliente foundCliente = findClienteById(idCliente);
+        List<Indirizzo> indirizziCliente = foundCliente.getIndirizzi();
+
+        Optional<Indirizzo> indirizzoFound = indirizziCliente.stream()
+                .filter(indirizzo -> indirizzo.getIndirizzoType().equals(IndirizzoType.SEDELEGALE))
+                .findFirst();
+
+        Indirizzo indirizzoToUpdate = indirizzoFound.orElseThrow(() ->
+                new NotFoundException("Nessun indirizzo con tipo SEDELEGALE trovato.")
+        );
+
+        Comune comuneFound = this.comuneService.findComuneById(payload.comune());
+        if (comuneFound == null) {
+            throw new BadRequestException("Il comune con id " + payload.comune() + " non esiste.");
+        }
+
+        indirizzoToUpdate.setVia(payload.via());
+        indirizzoToUpdate.setCap(payload.cap());
+        indirizzoToUpdate.setCivico(payload.civico());
+        indirizzoToUpdate.setLocalita(payload.localita());
+        indirizzoToUpdate.setComune(comuneFound);
+        indirizzoToUpdate.setProvincia(comuneFound.getProvincia());
+
+        Indirizzo indirizzoSaved = this.indirizzoService.save(indirizzoToUpdate);
+        System.out.println("Indirizzo modificato correttamente");
+        return indirizzoSaved;
+    }
+
+    public Indirizzo findClienteByIdAndUpdateIndirizzoSO(UUID idCliente, NewIndirizzoSedeOperativaDTO payload)
+    {
+        Cliente foundCliente = findClienteById(idCliente);
+        List<Indirizzo> indirizziCliente = foundCliente.getIndirizzi();
+
+        Optional<Indirizzo> indirizzoFound = indirizziCliente.stream()
+                .filter(indirizzo -> indirizzo.getIndirizzoType().equals(IndirizzoType.SEDEOPERATIVA))
+                .findFirst();
+
+        Indirizzo indirizzoToUpdate = indirizzoFound.orElseThrow(() ->
+                new NotFoundException("Nessun indirizzo con tipo SEDEOPERATIVA trovato.")
+        );
+
+        Comune comuneFound = this.comuneService.findComuneById(payload.comune());
+        if (comuneFound == null) {
+            throw new BadRequestException("Il comune con id " + payload.comune() + " non esiste.");
+        }
+
+        indirizzoToUpdate.setVia(payload.via());
+        indirizzoToUpdate.setCap(payload.cap());
+        indirizzoToUpdate.setCivico(payload.civico());
+        indirizzoToUpdate.setLocalita(payload.localita());
+        indirizzoToUpdate.setComune(comuneFound);
+        indirizzoToUpdate.setProvincia(comuneFound.getProvincia());
+
+        Indirizzo indirizzoSaved = this.indirizzoService.save(indirizzoToUpdate);
+        System.out.println("Indirizzo modificato correttamente");
+        return indirizzoSaved;
     }
 
 }
