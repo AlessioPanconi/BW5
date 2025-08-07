@@ -1,18 +1,17 @@
 package buildweeek.bw2.controllers;
 
-import buildweeek.bw2.DTO.NewClienteDTO;
-import buildweeek.bw2.DTO.NewIndirizzoSedeLegaleDTO;
-import buildweeek.bw2.DTO.NewIndirizzoSedeOperativaDTO;
-import buildweeek.bw2.DTO.NewUtenteDTO;
+import buildweeek.bw2.DTO.*;
 import buildweeek.bw2.DTO.payloadMetodiClienti.DataInserimentoDTO;
 import buildweeek.bw2.DTO.payloadMetodiClienti.DataUltimoContattoDTO;
 import buildweeek.bw2.DTO.payloadMetodiClienti.FatturatoAnnualeDTO;
 import buildweeek.bw2.DTO.payloadMetodiClienti.PartialNameDTO;
 import buildweeek.bw2.entities.Cliente;
+import buildweeek.bw2.entities.Fattura;
 import buildweeek.bw2.entities.Indirizzo;
 import buildweeek.bw2.entities.Utente;
 import buildweeek.bw2.exceptions.ValidationException;
 import buildweeek.bw2.services.ClienteService;
+import buildweeek.bw2.services.FatturaService;
 import buildweeek.bw2.services.IndirizzoService;
 import buildweeek.bw2.services.UtenteService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +36,9 @@ public class UtenteController {
 
     @Autowired
     private ClienteService clienteService;
+
+    @Autowired
+    private FatturaService fatturaService;
 
     @Autowired
     private IndirizzoService indirizzoService;
@@ -95,6 +97,32 @@ public class UtenteController {
     @PreAuthorize("hasAuthority('ADMIN')")
     public void findUtenteByAndDeleteRoleAdmin(@PathVariable UUID idUtente) {
         this.utenteService.findUtenteByIdAndRemoveAdmin(idUtente);
+    }
+
+    // opzione admin Fatture
+    @PostMapping("/cliente/nuovaFattura/{clienteId}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @ResponseStatus(HttpStatus.CREATED)
+    public FatturaRespDTO save(@PathVariable UUID idCliente,@RequestBody @Validated FatturaDTO body, BindingResult validResu){
+        if (validResu.hasErrors()) {
+            throw new ValidationException(validResu.getFieldErrors()
+                    .stream().map(fieldError -> fieldError.getDefaultMessage()).toList());
+        }else {
+            Fattura newF = this.fatturaService.save(idCliente,body);
+            return new FatturaRespDTO(newF.getIdFattura());
+        }
+    }
+    @PutMapping("/cliente/modificaFattura/{idFattura}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @ResponseStatus(HttpStatus.OK)
+    public Fattura getByIdAndUpdate(@PathVariable UUID idFattura, @RequestBody FatturaDTO payload){
+        return this.fatturaService.findByIdAndUpdate(idFattura, payload);
+    }
+    @DeleteMapping("/cliente/eliminaFattura/{idFattura}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @ResponseStatus(HttpStatus.OK)
+    public void getByIdAndDelete(UUID idFattura){
+        this.fatturaService.findByIdAndDelete(idFattura);
     }
 
     // sezione /me

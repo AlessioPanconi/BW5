@@ -24,11 +24,14 @@ public class FatturaService {
     @Autowired
     private ClienteService clienteService;
 
-    public Fattura save(FatturaDTO payload){
+    public Fattura save(UUID idCliente,FatturaDTO payload){
+
         this.fatturaRepository.findByNumero(payload.numero()).ifPresent(numero->{
             throw new BadRequestException("Esiste già una fattura con questo numero: " + payload.numero());
         });
-        Fattura newF = new Fattura(payload.dataFattura(), payload.importo(), payload.numero(), payload.statoFattura());
+
+        Cliente clienteFound = this.clienteService.findClienteById(idCliente);
+        Fattura newF = new Fattura(payload.dataFattura(), payload.importo(), payload.numero(), payload.statoFattura(),clienteFound);
         Fattura saveF = this.fatturaRepository.save(newF);
         return saveF;
     }
