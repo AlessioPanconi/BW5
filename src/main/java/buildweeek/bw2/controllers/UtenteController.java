@@ -69,6 +69,13 @@ public class UtenteController {
         return this.utenteService.findUtenteById(idUtente);
     }
 
+    @GetMapping("/cliente")
+    public Page<Cliente> findClientiBySL(@RequestParam(defaultValue = "0") int pageNumber, @RequestParam(defaultValue = "10") int pageSize, @RequestParam(defaultValue = "provincia") String sort) {
+        return this.clienteService.findClientiBySL(pageNumber, pageSize, sort);
+    }
+
+
+
     @DeleteMapping("/{idUtente}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAuthority('ADMIN')")

@@ -4,14 +4,13 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.List;
-import java.util.UUID;
+import lombok.ToString;
 
 @Entity
 @Table(name = "provincia")
 @Getter
 @Setter
+@ToString
 @NoArgsConstructor
 public class Provincia {
 

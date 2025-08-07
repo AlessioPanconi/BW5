@@ -52,12 +52,10 @@ public class Cliente {
     @Enumerated(EnumType.STRING)
     private CustomerType customerType;
 
-    @OneToMany
-    @JoinColumn(name = "id_cliente")
+    @OneToMany(mappedBy = "cliente")
     private List<Indirizzo> indirizzi;
 
-    @OneToMany
-    @JoinColumn(name = "id_cliente")
+    @OneToMany(mappedBy = "cliente")
     private List<Fattura> fatture;
 
     public Cliente(String email, String pec, String telefono, String partitaIva, String ragioneSociale, LocalDate dataInserimento, LocalDate dataUltimoContatto, double fatturatoAnnuale, String emailContatto, String nomeContatto, String cognomeContatto, String telefonoContatto, CustomerType customerType , List<Indirizzo> indirizzi) {

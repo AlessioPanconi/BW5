@@ -18,8 +18,7 @@ public class Comune {
     @Id
     private String comune;
 
-    @OneToMany
-    @JoinColumn(name = "id_comune")
+    @OneToMany(mappedBy = "comune")
     private List<Indirizzo> indirizzi;
 
     @ManyToOne

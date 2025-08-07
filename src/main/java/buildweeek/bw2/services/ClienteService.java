@@ -96,10 +96,10 @@ public class ClienteService {
             }
 
             Indirizzo newIndirizzoSL = new Indirizzo(payloadIndirizzoSL.via(), payloadIndirizzoSL.civico(), payloadIndirizzoSL.localita(),
-                    payloadIndirizzoSL.cap(), comuneFoundSL, IndirizzoType.SEDELEGALE, comuneFoundSL.getProvincia());
+                    payloadIndirizzoSL.cap(), comuneFoundSL, IndirizzoType.SEDELEGALE, comuneFoundSL.getProvincia().getProvincia());
 
             Indirizzo newIndirizzoSO = new Indirizzo(payloadIndirizzoSO.via(), payloadIndirizzoSO.civico(), payloadIndirizzoSO.localita(),
-                    payloadIndirizzoSO.cap(), comuneFoundSO, IndirizzoType.SEDEOPERATIVA, comuneFoundSO.getProvincia());
+                    payloadIndirizzoSO.cap(), comuneFoundSO, IndirizzoType.SEDEOPERATIVA, comuneFoundSO.getProvincia().getProvincia());
 
             this.indirizzoService.save(newIndirizzoSL);
             this.indirizzoService.save(newIndirizzoSO);
@@ -196,6 +196,11 @@ public class ClienteService {
 
     public Page<Cliente> findAllReverse(int pageNumber, int pageSize, String sort) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize , Sort.by(Sort.Direction.DESC,sort) );
+        return this.clienteRepository.findAll(pageable);
+    }
+
+    public Page<Cliente> findClientiBySL(int pageNumber, int pageSize, String sort) {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize , Sort.by(sort) );
         return this.clienteRepository.findAll(pageable);
     }
 
