@@ -1,12 +1,17 @@
 package buildweeek.bw2.services;
 
+import buildweeek.bw2.DTO.NewIndirizzoSedeLegaleDTO;
+import buildweeek.bw2.DTO.NewIndirizzoSedeOperativaDTO;
 import buildweeek.bw2.DTO.payloadMetodiClienti.DataInserimentoDTO;
 import buildweeek.bw2.DTO.NewClienteDTO;
 import buildweeek.bw2.DTO.payloadMetodiClienti.DataUltimoContattoDTO;
 import buildweeek.bw2.DTO.payloadMetodiClienti.FatturatoAnnualeDTO;
 import buildweeek.bw2.DTO.payloadMetodiClienti.PartialNameDTO;
 import buildweeek.bw2.entities.Cliente;
+import buildweeek.bw2.entities.Comune;
+import buildweeek.bw2.entities.Indirizzo;
 import buildweeek.bw2.enums.CustomerType;
+import buildweeek.bw2.enums.IndirizzoType;
 import buildweeek.bw2.exceptions.BadRequestException;
 import buildweeek.bw2.exceptions.NotFoundException;
 import buildweeek.bw2.repositories.ClienteRepository;
@@ -19,6 +24,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -27,6 +33,12 @@ public class ClienteService {
 
     @Autowired
     private ClienteRepository clienteRepository;
+
+    @Autowired
+    private ComuneService comuneService;
+
+    @Autowired
+    private IndirizzoService indirizzoService;
 
     public Page<Cliente> findAllClienti(int pageNumber, int pageSize) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
@@ -37,33 +49,38 @@ public class ClienteService {
         return this.clienteRepository.findById(idCliente).orElseThrow(()-> new NotFoundException(idCliente));
     }
 
-    public Cliente saveCliente(NewClienteDTO payload)
+    public Cliente saveCliente(NewClienteDTO payloadCliente, NewIndirizzoSedeLegaleDTO payloadIndirizzoSL , NewIndirizzoSedeOperativaDTO payloadIndirizzoSO)
     {
-        this.clienteRepository.findByEmail(payload.email()).ifPresent(cliente -> {
+        Comune comuneFoundSL =this.comuneService.findComuneById(payloadIndirizzoSL.comune());
+        if (comuneFoundSL == null) throw new BadRequestException("Il comune della sede legale: " + payloadIndirizzoSL.comune() + " non esiste, assicurati di aver inserito un comune esistente");
+        Comune comuneFoundSO =this.comuneService.findComuneById(payloadIndirizzoSO.comune());
+        if (comuneFoundSO == null) throw new BadRequestException("Il comune della sede operativa: " + payloadIndirizzoSO.comune() + " non esiste, assicurati di aver inserito un comune esistente");
+
+        this.clienteRepository.findByEmail(payloadCliente.email()).ifPresent(cliente -> {
             throw new BadRequestException("L'email: " + cliente.getEmail() + " appartiene già ad un'altro cliente!");
         });
 
-        this.clienteRepository.findByPec(payload.pec()).ifPresent(cliente -> {
+        this.clienteRepository.findByPec(payloadCliente.pec()).ifPresent(cliente -> {
             throw new BadRequestException("La pec: " + cliente.getPec() + " appartiene già ad un'altro cliente!");
         });
 
-        this.clienteRepository.findByPartitaIva(payload.partitaIva()).ifPresent(cliente -> {
+        this.clienteRepository.findByPartitaIva(payloadCliente.partitaIva()).ifPresent(cliente -> {
             throw new BadRequestException("La partita iva: " + cliente.getPartitaIva() + " appartiene già ad un'altro cliente!");
         });
 
-        this.clienteRepository.findByTelefono(payload.telefono()).ifPresent(cliente -> {
+        this.clienteRepository.findByTelefono(payloadCliente.telefono()).ifPresent(cliente -> {
             throw new BadRequestException("Il telefono: " + cliente.getTelefono() + " appartiene già ad un'altro cliente!");
         });
 
         try {
-            LocalDate dataInserimento = LocalDate.parse(payload.dataInserimento());
-            LocalDate dataUltimoContatto = LocalDate.parse(payload.dataUltimoContatto());
+            LocalDate dataInserimento = LocalDate.parse(payloadCliente.dataInserimento());
+            LocalDate dataUltimoContatto = LocalDate.parse(payloadCliente.dataUltimoContatto());
 
             if(dataInserimento.isAfter(LocalDate.now())) throw new BadRequestException("La data di inserimento non può essere dopo oggi!");
             if(dataUltimoContatto.isAfter(LocalDate.now()) && dataUltimoContatto.isBefore(dataInserimento))
                 throw new BadRequestException("La data di ultimo contatto non può essere dopo oggi o prima della data di inserimento!");
 
-            String customerTypeStr = payload.customerType();
+            String customerTypeStr = payloadCliente.customerType();
             CustomerType type = null;
 
             if ("PA".equalsIgnoreCase(customerTypeStr)) {
@@ -78,9 +95,21 @@ public class ClienteService {
                 throw new BadRequestException("Inerisci un tipo di cliente valido!");
             }
 
-            Cliente newCliente = new Cliente(payload.email(),payload.pec(), payload.telefono(), payload.partitaIva(), payload.ragioneSociale(),
-                    dataInserimento,dataUltimoContatto, payload.fatturatoAnnuale(), payload.emailContatto(), payload.nomeContatto(),
-                    payload.cognomeContatto(), payload.telefonoContatto(),type);
+            Indirizzo newIndirizzoSL = new Indirizzo(payloadIndirizzoSL.via(), payloadIndirizzoSL.civico(), payloadIndirizzoSL.localita(),
+                    payloadIndirizzoSL.cap(), comuneFoundSL, IndirizzoType.SEDELEGALE, comuneFoundSL.getProvincia());
+
+            Indirizzo newIndirizzoSO = new Indirizzo(payloadIndirizzoSO.via(), payloadIndirizzoSO.civico(), payloadIndirizzoSO.localita(),
+                    payloadIndirizzoSO.cap(), comuneFoundSO, IndirizzoType.SEDEOPERATIVA, comuneFoundSO.getProvincia());
+
+            this.indirizzoService.save(newIndirizzoSL);
+            this.indirizzoService.save(newIndirizzoSO);
+            List<Indirizzo> listaIndirizzi = new ArrayList<>();
+            listaIndirizzi.add(newIndirizzoSL);
+            listaIndirizzi.add(newIndirizzoSO);
+
+            Cliente newCliente = new Cliente(payloadCliente.email(),payloadCliente.pec(), payloadCliente.telefono(), payloadCliente.partitaIva(), payloadCliente.ragioneSociale(),
+                    dataInserimento,dataUltimoContatto, payloadCliente.fatturatoAnnuale(), payloadCliente.emailContatto(), payloadCliente.nomeContatto(),
+                    payloadCliente.cognomeContatto(), payloadCliente.telefonoContatto(),type,listaIndirizzi);
             Cliente savedCliente = this.clienteRepository.save(newCliente);
             System.out.println("Il cliente con id: " + savedCliente.getIdCliente() + " è stato salvato correttamente!");
             return savedCliente;

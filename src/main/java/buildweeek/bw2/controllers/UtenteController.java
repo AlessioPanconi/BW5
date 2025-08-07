@@ -1,15 +1,19 @@
 package buildweeek.bw2.controllers;
 
 import buildweeek.bw2.DTO.NewClienteDTO;
+import buildweeek.bw2.DTO.NewIndirizzoSedeLegaleDTO;
+import buildweeek.bw2.DTO.NewIndirizzoSedeOperativaDTO;
 import buildweeek.bw2.DTO.NewUtenteDTO;
 import buildweeek.bw2.DTO.payloadMetodiClienti.DataInserimentoDTO;
 import buildweeek.bw2.DTO.payloadMetodiClienti.DataUltimoContattoDTO;
 import buildweeek.bw2.DTO.payloadMetodiClienti.FatturatoAnnualeDTO;
 import buildweeek.bw2.DTO.payloadMetodiClienti.PartialNameDTO;
 import buildweeek.bw2.entities.Cliente;
+import buildweeek.bw2.entities.Indirizzo;
 import buildweeek.bw2.entities.Utente;
 import buildweeek.bw2.exceptions.ValidationException;
 import buildweeek.bw2.services.ClienteService;
+import buildweeek.bw2.services.IndirizzoService;
 import buildweeek.bw2.services.UtenteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -33,6 +37,9 @@ public class UtenteController {
 
     @Autowired
     private ClienteService clienteService;
+
+    @Autowired
+    private IndirizzoService indirizzoService;
 
     // Opzioni per admin
 
@@ -69,8 +76,13 @@ public class UtenteController {
 
     @PutMapping("/{idUtente}")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public Utente getUtenteByIdAndUpdate(@PathVariable UUID idUtente, @RequestBody @Validated NewUtenteDTO payload) {
-        return this.utenteService.findUtenteByIdAndUpdate(idUtente, payload);
+    public Utente getUtenteByIdAndUpdate(@PathVariable UUID idUtente, @RequestBody @Validated NewUtenteDTO payload, BindingResult validationResult) {
+        if (validationResult.hasErrors()) {
+            throw new ValidationException(validationResult.getFieldErrors()
+                    .stream().map(fieldError -> fieldError.getDefaultMessage()).toList());
+        } else {
+            return this.utenteService.findUtenteByIdAndUpdate(idUtente, payload);
+        }
     }
 
     @PatchMapping("/{idUtente}/addRole")
@@ -93,8 +105,14 @@ public class UtenteController {
     }
 
     @PutMapping("/me")
-    public Utente modificaIlMioProfilo(@AuthenticationPrincipal Utente currentAuthenticatedUtente, @RequestBody @Validated NewUtenteDTO payload) {
-        return this.utenteService.findUtenteByIdAndUpdate(currentAuthenticatedUtente.getIdUtente(), payload);
+    public Utente modificaIlMioProfilo(@AuthenticationPrincipal Utente currentAuthenticatedUtente, @RequestBody @Validated NewUtenteDTO payload, BindingResult validationResult) {
+        if (validationResult.hasErrors()) {
+            throw new ValidationException(validationResult.getFieldErrors()
+                    .stream().map(fieldError -> fieldError.getDefaultMessage()).toList());
+        } else {
+            return this.utenteService.findUtenteByIdAndUpdate(currentAuthenticatedUtente.getIdUtente(), payload);
+        }
+
     }
 
     @DeleteMapping("/me")
@@ -110,14 +128,26 @@ public class UtenteController {
     // Sezione cliente
 
     @PostMapping("/cliente")
-    public Cliente saveCliente(@RequestBody @Validated NewClienteDTO payload) {
-        return this.clienteService.saveCliente(payload);
+    public Cliente saveCliente(@RequestBody @Validated NewClienteDTO payloadCliente, @RequestBody @Validated NewIndirizzoSedeLegaleDTO payloadIndirizzoSL, @RequestBody @Validated NewIndirizzoSedeOperativaDTO payloadIndirizzoSO, BindingResult validationResult) {
+        if (validationResult.hasErrors()) {
+            throw new ValidationException(validationResult.getFieldErrors()
+                    .stream().map(fieldError -> fieldError.getDefaultMessage()).toList());
+        } else {
+            return this.clienteService.saveCliente(payloadCliente,payloadIndirizzoSL,payloadIndirizzoSO);
+        }
     }
 
     @PutMapping("/cliente/{clienteId}")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public Cliente updateCliente(@PathVariable UUID clienteId, @RequestBody @Validated NewClienteDTO payload) {
-        return this.clienteService.findClienteByIdAndUpdate(clienteId, payload);
+    public Cliente updateCliente(@PathVariable UUID clienteId, @RequestBody @Validated NewClienteDTO payload, BindingResult validationResult) {
+
+        if (validationResult.hasErrors()) {
+            throw new ValidationException(validationResult.getFieldErrors()
+                    .stream().map(fieldError -> fieldError.getDefaultMessage()).toList());
+        } else {
+            return this.clienteService.findClienteByIdAndUpdate(clienteId, payload);
+        }
+
     }
 
     @DeleteMapping("/cliente/{clienteId}")
@@ -128,38 +158,71 @@ public class UtenteController {
 
     @PostMapping("/cliente/byFatturatoMag")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public List<Cliente> findClientiByFatturatoMaggiore(@RequestBody @Validated FatturatoAnnualeDTO payload) {
-        return this.clienteService.findClientiByFatturatoMaggiore(payload);
+    public List<Cliente> findClientiByFatturatoMaggiore(@RequestBody @Validated FatturatoAnnualeDTO payload, BindingResult validationResult) {
+
+        if (validationResult.hasErrors()) {
+            throw new ValidationException(validationResult.getFieldErrors()
+                    .stream().map(fieldError -> fieldError.getDefaultMessage()).toList());
+        } else {
+            return this.clienteService.findClientiByFatturatoMaggiore(payload);
+        }
+
     }
 
     @PostMapping("/cliente/byFatturatoMin")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public List<Cliente> findClientiByFatturatoMinore(@RequestBody @Validated FatturatoAnnualeDTO payload) {
-        return this.clienteService.findClientiByFatturatoMinore(payload);
+    public List<Cliente> findClientiByFatturatoMinore(@RequestBody @Validated FatturatoAnnualeDTO payload, BindingResult validationResult) {
+        if (validationResult.hasErrors()) {
+            throw new ValidationException(validationResult.getFieldErrors()
+                    .stream().map(fieldError -> fieldError.getDefaultMessage()).toList());
+        } else {
+            return this.clienteService.findClientiByFatturatoMinore(payload);
+        }
     }
 
     @PostMapping("/cliente/byDataInserimentoBefore")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public List<Cliente> findClientiByBeforeDataInserimento(@RequestBody @Validated DataInserimentoDTO payload) {
-        return this.clienteService.findClientiByBeforeDataInserimento(payload);
+    public List<Cliente> findClientiByBeforeDataInserimento(@RequestBody @Validated DataInserimentoDTO payload, BindingResult validationResult) {
+
+        if (validationResult.hasErrors()) {
+            throw new ValidationException(validationResult.getFieldErrors()
+                    .stream().map(fieldError -> fieldError.getDefaultMessage()).toList());
+        } else {
+            return this.clienteService.findClientiByBeforeDataInserimento(payload);
+        }
     }
 
     @PostMapping("/cliente/byDataInserimentoAfter")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public List<Cliente> findClientiByAfterDataInserimento(@RequestBody @Validated DataInserimentoDTO payload) {
-        return this.clienteService.findClientiByAfterDataInserimento(payload);
+    public List<Cliente> findClientiByAfterDataInserimento(@RequestBody @Validated DataInserimentoDTO payload , BindingResult validationResult) {
+        if (validationResult.hasErrors()) {
+            throw new ValidationException(validationResult.getFieldErrors()
+                    .stream().map(fieldError -> fieldError.getDefaultMessage()).toList());
+        } else {
+            return this.clienteService.findClientiByAfterDataInserimento(payload);
+        }
     }
 
     @PostMapping("/cliente/byDataUltimoContatto")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public List<Cliente> findClientiByDataUltimoContatto(@RequestBody @Validated DataUltimoContattoDTO payload) {
-        return this.clienteService.findClientiByDataUltimoContatto(payload);
+    public List<Cliente> findClientiByDataUltimoContatto(@RequestBody @Validated DataUltimoContattoDTO payload ,BindingResult validationResult) {
+        if (validationResult.hasErrors()) {
+            throw new ValidationException(validationResult.getFieldErrors()
+                    .stream().map(fieldError -> fieldError.getDefaultMessage()).toList());
+        } else {
+            return this.clienteService.findClientiByDataUltimoContatto(payload);
+        }
     }
 
     @PostMapping("/cliente/byPartialName")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public List<Cliente> findClientiByPartialName(@RequestBody @Validated PartialNameDTO payload) {
-        return this.clienteService.findClientiByPartialName(payload);
+    public List<Cliente> findClientiByPartialName(@RequestBody @Validated PartialNameDTO payload,BindingResult validationResult) {
+        if (validationResult.hasErrors()) {
+            throw new ValidationException(validationResult.getFieldErrors()
+                    .stream().map(fieldError -> fieldError.getDefaultMessage()).toList());
+        } else {
+            return this.clienteService.findClientiByPartialName(payload);
+        }
     }
 
     @GetMapping("/cliente")
@@ -183,4 +246,31 @@ public class UtenteController {
     public Page<Cliente> getPageClientiByDataUltimoContatto(@RequestParam(defaultValue = "0") int pageNumber, @RequestParam(defaultValue = "10") int pageSize) {
         return this.clienteService.findAllReverse(pageNumber, pageSize, "dataUltimoContatto");
     }
+
+    //SEZIONE ADMIN GESTIONE INDIRIZZI
+
+    @PostMapping("/cliente/updateIndirizzoSL/{clienteId}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public Indirizzo findUtenteByIdAndUpdateIndirizzoSL(@PathVariable UUID clienteId, @RequestBody @Validated NewIndirizzoSedeLegaleDTO body,BindingResult validationResult)
+    {
+        if (validationResult.hasErrors()) {
+            throw new ValidationException(validationResult.getFieldErrors()
+                    .stream().map(fieldError -> fieldError.getDefaultMessage()).toList());
+        } else {
+            return this.indirizzoService.findClienteByIdAndUpdateIndirizzoSL(clienteId,body);
+        }
+    }
+
+    @PostMapping("/cliente/updateIndirizzoSo/{clienteId}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public Indirizzo findUtenteByIdAndUpdateIndirizzoSO(@PathVariable UUID clienteId, @RequestBody @Validated NewIndirizzoSedeOperativaDTO body,BindingResult validationResult)
+    {
+        if (validationResult.hasErrors()) {
+            throw new ValidationException(validationResult.getFieldErrors()
+                    .stream().map(fieldError -> fieldError.getDefaultMessage()).toList());
+        } else {
+            return this.indirizzoService.findClienteByIdAndUpdateIndirizzoSO(clienteId,body);
+        }
+    }
+
 }

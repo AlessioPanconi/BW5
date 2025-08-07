@@ -1,6 +1,7 @@
 package buildweeek.bw2.entities;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -17,6 +18,7 @@ public class Fattura {
 
     @Id
     @GeneratedValue
+    @Setter(AccessLevel.NONE)
     @Column(name = "id_fattura")
     private UUID idFattura;
     @Column(name = "data_fattura")
