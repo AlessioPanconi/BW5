@@ -32,6 +32,7 @@ public class Indirizzo {
     @ManyToOne
     @JoinColumn(name = "comune")
     private Comune comune;
+
     @ManyToOne
     @JoinColumn(name = "provincia_id")
     private Provincia provincia;

@@ -275,6 +275,12 @@ public class UtenteController {
         return this.clienteService.findAllReverse(pageNumber, pageSize, "dataUltimoContatto");
     }
 
+//    @GetMapping("/cliente/sortByProvinciaIndirizzoSL")
+//    @PreAuthorize("hasAuthority('ADMIN')")
+//    public Page<Cliente> getPageClientiByProvinciaIndirizzoSL(@RequestParam(defaultValue = "0") int pageNumber, @RequestParam(defaultValue = "10") int pageSize) {
+//        return this.clienteService.findByProvinciaSL(pageNumber, pageSize);
+//    }
+
     //SEZIONE ADMIN GESTIONE INDIRIZZI
 
     @PostMapping("/cliente/updateIndirizzoSL/{clienteId}")
