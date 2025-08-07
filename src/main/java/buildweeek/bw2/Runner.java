@@ -108,10 +108,10 @@ public class Runner implements CommandLineRunner {
 
             if (provinciaTrovata != null) {
                 String sqlInsert = "INSERT INTO comune (comune, provincia) VALUES (?, ?) ON CONFLICT DO NOTHING";
-                try (PreparedStatement insertStmt = conn.prepareStatement(sqlInsert)) {
-                    insertStmt.setString(1, nomeComuneCsv);
-                    insertStmt.setString(2, provinciaTrovata);
-                    insertStmt.executeUpdate();
+                try (PreparedStatement ps = conn.prepareStatement(sqlInsert)) {
+                    ps.setString(1, nomeComuneCsv);
+                    ps.setString(2, provinciaTrovata);
+                    ps.executeUpdate();
                 }
             } else {
                 System.out.println("Provincia non trovata per: " + nomeProvinciaCsv);
