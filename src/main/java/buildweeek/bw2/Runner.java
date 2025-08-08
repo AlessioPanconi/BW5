@@ -33,7 +33,7 @@ public class Runner implements CommandLineRunner {
 
     private void caricaProvince(String filePath) {
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
-            br.readLine(); // skip header
+            br.readLine();
             String line;
             while ((line = br.readLine()) != null) {
                 if (line.trim().isEmpty()) continue;
@@ -56,7 +56,7 @@ public class Runner implements CommandLineRunner {
 
     private void caricaComuni(String filePath) {
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
-            br.readLine(); // skip header
+            br.readLine();
             String line;
             while ((line = br.readLine()) != null) {
                 if (line.trim().isEmpty()) continue;
@@ -64,8 +64,7 @@ public class Runner implements CommandLineRunner {
 
                 String nomeComune = data[2].trim();
                 String nomeProvinciaRaw = data[3].trim();
-
-                // Normalizzazione nomi provincia
+                
                 String nomeProvincia = normalizzaProvincia(nomeProvinciaRaw);
 
                 Optional<Provincia> provinciaOpt = provinciaRepository.findById(nomeProvincia);
