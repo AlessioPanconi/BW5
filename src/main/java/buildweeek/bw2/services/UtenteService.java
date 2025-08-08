@@ -134,6 +134,7 @@ public class UtenteService {
         }
     }
 
+
     public void findUtenteByIdAndDelete(UUID idUtente) {
         Utente found = findUtenteById(idUtente);
         this.utenteRepository.delete(found);

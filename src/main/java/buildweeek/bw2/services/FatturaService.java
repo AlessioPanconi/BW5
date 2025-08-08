@@ -3,15 +3,18 @@ package buildweeek.bw2.services;
 import buildweeek.bw2.DTO.FatturaDTO;
 import buildweeek.bw2.entities.Cliente;
 import buildweeek.bw2.entities.Fattura;
+import buildweeek.bw2.entities.Ruolo;
 import buildweeek.bw2.entities.StatoFattura;
 import buildweeek.bw2.exceptions.BadRequestException;
 import buildweeek.bw2.exceptions.NotFoundException;
 import buildweeek.bw2.repositories.FatturaRepository;
+import buildweeek.bw2.repositories.StatoFatturaRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,6 +26,8 @@ public class FatturaService {
     private FatturaRepository fatturaRepository;
     @Autowired
     private ClienteService clienteService;
+    @Autowired
+    private StatoFatturaRepository statoFatturaRepository;
 
     public Fattura save(UUID idCliente,FatturaDTO payload){
 
@@ -31,9 +36,19 @@ public class FatturaService {
         });
 
         Cliente clienteFound = this.clienteService.findClienteById(idCliente);
-        Fattura newF = new Fattura(payload.dataFattura(), payload.importo(), payload.numero(), payload.statoFattura(),clienteFound);
+        StatoFattura statoFattura = this.statoFatturaRepository.findByNomeStatoFattura("NON_PAGATA").orElseThrow(() -> new NotFoundException("STATO FATTURA: NON_PAGATA INESISTENTE!"));
+
+        try {
+            LocalDate dataFattura = LocalDate.parse(payload.dataFattura());
+        Fattura newF = new Fattura(dataFattura, payload.importo(), payload.numero(), statoFattura,clienteFound);
+        clienteFound.getFatture().add(newF);
         Fattura saveF = this.fatturaRepository.save(newF);
         return saveF;
+        } catch (DateTimeParseException e) {
+            throw new BadRequestException("Il formato della data inserita non è valido. Il formato corretto è yyyy-mm-dd.");
+        }
+
+
     }
     public Fattura findById(UUID fatturaId){
         return this.fatturaRepository.findById(fatturaId).orElseThrow(()->new NotFoundException(fatturaId));
@@ -42,13 +57,18 @@ public class FatturaService {
         return this.fatturaRepository.findByNumero(numero).orElseThrow(()-> new NotFoundException("Non esiste una fattura con questo numero"));
     }
     public Fattura findByIdAndUpdate(UUID fatturaId, FatturaDTO payload){
+        try {
         Fattura fnd = this.findById(fatturaId);
-            fnd.setDataFattura(payload.dataFattura());
+            LocalDate dataFattura = LocalDate.parse(payload.dataFattura());
+            fnd.setDataFattura(dataFattura);
             fnd.setImporto(payload.importo());
             fnd.setNumero(payload.numero());
             Fattura modFatt = this.fatturaRepository.save(fnd);
-            log.info("La fattura con numero " + fnd.getNumero() + " è stata modificata correttamente!");
+            log.info("La fattura con ID: " + fnd.getIdFattura() + " è stata modificata correttamente!");
             return modFatt;
+        } catch (DateTimeParseException e) {
+            throw new BadRequestException("Il formato della data inserita non è valido. Il formato corretto è yyyy-mm-dd.");
+        }
     }
     public void findByIdAndDelete(UUID fatturaId){
         Fattura fnd = this.findById(fatturaId);

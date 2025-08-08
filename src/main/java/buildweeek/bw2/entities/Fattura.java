@@ -1,5 +1,6 @@
 package buildweeek.bw2.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -32,6 +33,7 @@ public class Fattura {
 
     @ManyToOne
     @JoinColumn(name = "cliente_id")
+    @JsonIgnore
     private Cliente cliente;
 
     public Fattura(LocalDate dataFattura, double importo, long numero, StatoFattura statoFattura , Cliente cliente) {

@@ -105,25 +105,26 @@ public class UtenteController {
     @PostMapping("/cliente/nuovaFattura/{clienteId}")
     @PreAuthorize("hasAuthority('ADMIN')")
     @ResponseStatus(HttpStatus.CREATED)
-    public FatturaRespDTO save(@PathVariable UUID idCliente,@RequestBody @Validated FatturaDTO body, BindingResult validResu){
+    public FatturaRespDTO save(@PathVariable UUID clienteId ,@RequestBody @Validated FatturaDTO body, BindingResult validResu){
         if (validResu.hasErrors()) {
             throw new ValidationException(validResu.getFieldErrors()
                     .stream().map(fieldError -> fieldError.getDefaultMessage()).toList());
         }else {
-            Fattura newF = this.fatturaService.save(idCliente,body);
+            Fattura newF = this.fatturaService.save(clienteId,body);
             return new FatturaRespDTO(newF.getIdFattura());
         }
     }
     @PutMapping("/cliente/modificaFattura/{idFattura}")
     @PreAuthorize("hasAuthority('ADMIN')")
     @ResponseStatus(HttpStatus.OK)
-    public Fattura getByIdAndUpdate(@PathVariable UUID idFattura, @RequestBody FatturaDTO payload){
+    public Fattura getByIdAndUpdate(@PathVariable UUID idFattura, @RequestBody @Validated FatturaDTO payload){
         return this.fatturaService.findByIdAndUpdate(idFattura, payload);
     }
+
     @DeleteMapping("/cliente/eliminaFattura/{idFattura}")
     @PreAuthorize("hasAuthority('ADMIN')")
     @ResponseStatus(HttpStatus.OK)
-    public void getByIdAndDelete(UUID idFattura){
+    public void getByIdAndDelete(@PathVariable UUID idFattura){
         this.fatturaService.findByIdAndDelete(idFattura);
     }
 

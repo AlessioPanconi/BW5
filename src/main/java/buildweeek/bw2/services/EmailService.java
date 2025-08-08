@@ -29,7 +29,7 @@ public class EmailService {
                     .field("subject", "Registrazione avvenuta con successo!")
                     .field("text", "Ti informiamo che la tua registrazione è avvenuta correttamente")
                     .asJson();
-            
+
             //da togliere poi
             System.out.println("Mailgun Status: " + response.getStatus());
             System.out.println("Mailgun Body: " + response.getBody());
