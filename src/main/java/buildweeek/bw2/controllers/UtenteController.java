@@ -1,10 +1,7 @@
 package buildweeek.bw2.controllers;
 
 import buildweeek.bw2.DTO.*;
-import buildweeek.bw2.DTO.payloadMetodiClienti.DataInserimentoDTO;
-import buildweeek.bw2.DTO.payloadMetodiClienti.DataUltimoContattoDTO;
-import buildweeek.bw2.DTO.payloadMetodiClienti.FatturatoAnnualeDTO;
-import buildweeek.bw2.DTO.payloadMetodiClienti.PartialNameDTO;
+import buildweeek.bw2.DTO.payloadMetodiClienti.*;
 import buildweeek.bw2.entities.Cliente;
 import buildweeek.bw2.entities.Fattura;
 import buildweeek.bw2.entities.Indirizzo;
@@ -16,11 +13,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.parameters.P;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -40,9 +39,6 @@ public class UtenteController {
     @Autowired
     private IndirizzoService indirizzoService;
 
-    @Autowired
-    private EmailService emailService;
-
     // Opzioni per admin
 
     @PostMapping
@@ -53,9 +49,8 @@ public class UtenteController {
             throw new ValidationException(validationResult.getFieldErrors()
                     .stream().map(fieldError -> fieldError.getDefaultMessage()).toList());
         } else {
-            Utente nuovoUtente = this.utenteService.saveUtente(body);
-            emailService.sendRegistrationEmail(nuovoUtente.getEmail());
-            return nuovoUtente;
+            return this.utenteService.saveUtente(body);
+
         }
     }
 
@@ -127,6 +122,38 @@ public class UtenteController {
     public void getByIdAndDelete(@PathVariable UUID idFattura){
         this.fatturaService.findByIdAndDelete(idFattura);
     }
+
+    @GetMapping("/cliente/fattura/findByImporto")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public List<Fattura> getFatturaByImporto(@RequestBody @Validated ImportoDTO body){
+        return this.fatturaService.findByImporto(body.importoMin(), body.importoMax());
+    }
+
+    @GetMapping("/cliente/fattura/findByData")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public List<Fattura> findFatturaByData(@RequestBody @Validated DataDTO date){
+        return this.fatturaService.findBydataFattura(date);
+    }
+
+    @GetMapping("/cliente/fattura/findByAnno/{anno}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public List<Fattura> findFatturaByAnno(@PathVariable int anno){
+        return this.fatturaService.findByAnno(anno);
+    }
+
+
+    @GetMapping("/cliente/fattura/findByCliente/{clienteId}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public List<Fattura> findByCliente(@PathVariable UUID clienteId){
+        return this.fatturaService.findByCliente(clienteId);
+    }
+
+    @GetMapping("/cliente/fattura/findByNumero/{numeroFattura}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public Fattura findByNumero(@PathVariable long numeroFattura){
+        return this.fatturaService.findByNumero(numeroFattura);
+    }
+
 
     // sezione /me
 
@@ -303,5 +330,7 @@ public class UtenteController {
             return this.clienteService.findClienteByIdAndUpdateIndirizzoSO(clienteId,body);
         }
     }
+
+
 
 }
