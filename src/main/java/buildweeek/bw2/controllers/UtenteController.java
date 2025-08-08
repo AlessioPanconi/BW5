@@ -10,7 +10,10 @@ import buildweeek.bw2.entities.Fattura;
 import buildweeek.bw2.entities.Indirizzo;
 import buildweeek.bw2.entities.Utente;
 import buildweeek.bw2.exceptions.ValidationException;
-import buildweeek.bw2.services.*;
+import buildweeek.bw2.services.ClienteService;
+import buildweeek.bw2.services.FatturaService;
+import buildweeek.bw2.services.IndirizzoService;
+import buildweeek.bw2.services.UtenteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -40,9 +43,6 @@ public class UtenteController {
     @Autowired
     private IndirizzoService indirizzoService;
 
-    @Autowired
-    private EmailService emailService;
-
     // Opzioni per admin
 
     @PostMapping
@@ -53,9 +53,7 @@ public class UtenteController {
             throw new ValidationException(validationResult.getFieldErrors()
                     .stream().map(fieldError -> fieldError.getDefaultMessage()).toList());
         } else {
-            Utente nuovoUtente = this.utenteService.saveUtente(body);
-            emailService.sendRegistrationEmail(nuovoUtente.getEmail());
-            return nuovoUtente;
+            return this.utenteService.saveUtente(body);
         }
     }
 

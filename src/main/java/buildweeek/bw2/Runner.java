@@ -64,7 +64,7 @@ public class Runner implements CommandLineRunner {
 
                 String nomeComune = data[2].trim();
                 String nomeProvinciaRaw = data[3].trim();
-
+                
                 String nomeProvincia = normalizzaProvincia(nomeProvinciaRaw);
 
                 Optional<Provincia> provinciaOpt = provinciaRepository.findById(nomeProvincia);
